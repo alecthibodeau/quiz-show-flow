@@ -44,18 +44,14 @@ function selectClue(columnId: number, columnCategory: string, dollarAmount: numb
         <div class="category">
           {{ column.category }}
         </div>
-        <div
+        <button
           v-for="dollarAmount in column.dollarAmounts"
           :key="`${column.id}-${dollarAmount}`"
-          class="clue-container"
+          @click="selectClue(column.id, column.category, dollarAmount)"
+          class="clue-button"
         >
-          <button
-            @click="selectClue(column.id, column.category, dollarAmount)"
-            class="clue-button"
-          >
-            {{ `$${dollarAmount}` }}
-          </button>
-        </div>
+          {{ `$${dollarAmount}` }}
+        </button>
       </div>
     </div>
     <div v-if="currentClue.category" class="current-clue">
@@ -86,19 +82,16 @@ function selectClue(columnId: number, columnCategory: string, dollarAmount: numb
   line-height: 1rem;
   background: v-bind('colorBlue');
 }
-.clue-container {
+.clue-button {
   display: flex;
   justify-content: center;
+  width: 100%;
   padding: .5rem;
   margin-top: 1px;
-  background: v-bind('colorBlue');
-  font-weight: inherit;
-}
-.clue-button {
   border: none;
-  background-color: v-bind('colorBlue');
-  color: v-bind('colorDollarAmount');
   font-size: inherit;
   font-weight: inherit;
+  background-color: v-bind('colorBlue');
+  color: v-bind('colorDollarAmount');
 }
 </style>
