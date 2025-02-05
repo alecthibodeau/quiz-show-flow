@@ -1,14 +1,15 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router';
+// import { RouterView } from 'vue-router';
 
 /* Components */
-import HeaderComponent from './components/HeaderComponent.vue';
+// import HeaderComponent from './components/HeaderComponent.vue';
+import ScoreView from './views/ScoreView.vue';
 </script>
 
 <template>
-  <HeaderComponent />
+  <!-- <HeaderComponent /> -->
   <main>
-    <RouterView />
+    <ScoreView />
   </main>
 </template>
 

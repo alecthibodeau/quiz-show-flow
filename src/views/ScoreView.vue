@@ -4,25 +4,50 @@ import { ref } from 'vue';
 /* Interfaces */
 import type { Column } from '../interfaces/Column';
 
-const dollarAmountsFirst = ref<number[]>([200, 400, 600, 800, 1000]);
+const dollarAmountsFirst: number[] = [200, 400, 600, 800, 1000];
+
+const colorBlue: string = '#00f';
+const colorDollarAmount: string = '#f1c712';
+const colorWhite: string = '#fff';
 
 const columns = ref<Column[]>([
-  { id: 0, category: 'Science', dollarAmounts: dollarAmountsFirst.value },
-  { id: 1, category: 'World History', dollarAmounts: dollarAmountsFirst.value },
-  { id: 2, category: 'Books', dollarAmounts: dollarAmountsFirst.value },
-  { id: 3, category: 'Movies', dollarAmounts: dollarAmountsFirst.value },
-  { id: 4, category: 'Global Landmarks', dollarAmounts: dollarAmountsFirst.value },
-  { id: 5, category: 'Classical Music', dollarAmounts: dollarAmountsFirst.value }
+  { id: 0, category: 'Science', dollarAmounts: dollarAmountsFirst },
+  { id: 1, category: 'World History', dollarAmounts: dollarAmountsFirst },
+  { id: 2, category: 'Books', dollarAmounts: dollarAmountsFirst },
+  { id: 3, category: 'Movies', dollarAmounts: dollarAmountsFirst },
+  { id: 4, category: 'Global Landmarks', dollarAmounts: dollarAmountsFirst },
+  { id: 5, category: 'Classical Music', dollarAmounts: dollarAmountsFirst }
 ]);
+
+function selectClue(dollarAmount: number): void {
+  console.log('Clue selected:', dollarAmount);
+}
+
+
 </script>
 
 <template>
   <div class="score">
     <div class="game-board">
-      <div v-for="column in columns" :key="column.id">
-        <div>{{ column.category }}</div>
-        <div v-for="dollarAmount in column.dollarAmounts" :key="dollarAmount">
-          <div>{{ dollarAmount }}</div>
+      <div
+        v-for="column in columns"
+        :key="column.id"
+        class="column"
+      >
+        <div class="category">
+          {{ column.category }}
+        </div>
+        <div
+          v-for="dollarAmount in column.dollarAmounts"
+          :key="dollarAmount"
+          class="clue-container"
+        >
+          <button
+            @click="selectClue(dollarAmount)"
+            class="clue-button"
+          >
+            {{ `$${dollarAmount}` }}
+          </button>
         </div>
       </div>
     </div>
@@ -31,6 +56,38 @@ const columns = ref<Column[]>([
 
 <style>
 .game-board {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  align-items: end;
+  gap: 1px;
+}
+.column {
+  color: v-bind('colorWhite');
+  font-weight: 700;
+}
+.category {
   display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 3rem;
+  font-weight: inherit;
+  line-height: 1rem;
+  background: v-bind('colorBlue');
+}
+.clue-container {
+  display: flex;
+  justify-content: center;
+  padding: .5rem;
+  margin-top: 1px;
+  background: v-bind('colorBlue');
+  font-weight: inherit;
+}
+.clue-button {
+  border: none;
+  background-color: v-bind('colorBlue');
+  color: v-bind('colorDollarAmount');
+  font-size: inherit;
+  font-weight: inherit;
 }
 </style>
