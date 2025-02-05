@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { reactive, ref } from 'vue';
 
 /* Interfaces */
 import type { Column } from '../interfaces/Column';
@@ -10,6 +10,12 @@ const colorBlue: string = '#00f';
 const colorDollarAmount: string = '#f1c712';
 const colorWhite: string = '#fff';
 
+const currentClue = reactive<{ [key: string]: number | string }>({
+  column: 0,
+  category: '',
+  dollarAmount: 0
+});
+
 const columns = ref<Column[]>([
   { id: 0, category: 'Science', dollarAmounts: dollarAmountsFirst },
   { id: 1, category: 'World History', dollarAmounts: dollarAmountsFirst },
@@ -19,19 +25,20 @@ const columns = ref<Column[]>([
   { id: 5, category: 'Classical Music', dollarAmounts: dollarAmountsFirst }
 ]);
 
-function selectClue(dollarAmount: number): void {
-  console.log('Clue selected:', dollarAmount);
+function selectClue(columnId: number, columnCategory: string, dollarAmount: number): void {
+  currentClue.column = columnId;
+  currentClue.category = columnCategory;
+  currentClue.dollarAmount = dollarAmount;
 }
-
-
 </script>
 
 <template>
   <div class="score">
+
     <div class="game-board">
       <div
         v-for="column in columns"
-        :key="column.id"
+        :key="`column-${column.id}`"
         class="column"
       >
         <div class="category">
@@ -39,17 +46,21 @@ function selectClue(dollarAmount: number): void {
         </div>
         <div
           v-for="dollarAmount in column.dollarAmounts"
-          :key="dollarAmount"
+          :key="`${column.id}-${dollarAmount}`"
           class="clue-container"
         >
           <button
-            @click="selectClue(dollarAmount)"
+            @click="selectClue(column.id, column.category, dollarAmount)"
             class="clue-button"
           >
             {{ `$${dollarAmount}` }}
           </button>
         </div>
       </div>
+    </div>
+    <div v-if="currentClue.category" class="current-clue">
+      <h2>{{ currentClue.category }}</h2>
+      <h3>{{ `$${currentClue.dollarAmount}` }}</h3>
     </div>
   </div>
 </template>
