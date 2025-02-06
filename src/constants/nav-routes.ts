@@ -1,14 +1,17 @@
 /* Components */
 import HomeView from '../views/HomeView.vue';
+import ScoreView from '../views/ScoreView.vue';
 
 /* Interfaces */
 import type { Route } from '../interfaces/Route';
+
+const isRoutingActive: boolean = false;
 
 const navRoutes: Route[] = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: isRoutingActive ? HomeView : ScoreView
   },
   {
     path: '/about',
