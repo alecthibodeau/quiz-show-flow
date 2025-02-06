@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue';
 
 /* Interfaces */
+import type { Clue } from '../interfaces/Clue';
 import type { Column } from '../interfaces/Column';
 
 /* Constants */
@@ -11,11 +12,13 @@ const { blue, dollarAmount, white } = colors;
 
 const dollarAmountsFirst: number[] = [200, 400, 600, 800, 1000];
 
-const currentClue = reactive<{ [key: string]: number | string }>({
+const currentClue = reactive<Clue>({
   column: 0,
   category: '',
   dollarAmount: 0
 });
+
+const currentScore = ref<number>(0);
 
 const columns = ref<Column[]>([
   { id: 0, category: 'Science', dollarAmounts: dollarAmountsFirst },
@@ -31,11 +34,21 @@ function selectClue(columnId: number, columnCategory: string, dollarAmount: numb
   currentClue.category = columnCategory;
   currentClue.dollarAmount = dollarAmount;
 }
+
+function clearClue(): void {
+  currentClue.column = 0;
+  currentClue.category = '';
+  currentClue.dollarAmount = 0;
+}
+
+function updateScore(increment: number): void {
+  currentScore.value += increment;
+  clearClue();
+}
 </script>
 
 <template>
   <div class="score">
-
     <div class="game-board">
       <div
         v-for="column in columns"
@@ -55,9 +68,17 @@ function selectClue(columnId: number, columnCategory: string, dollarAmount: numb
         </button>
       </div>
     </div>
+    <div>
+      {{ `Current score: ${currentScore}` }}
+    </div>
     <div v-if="currentClue.category" class="current-clue">
-      <h2>{{ currentClue.category }}</h2>
-      <h3>{{ `$${currentClue.dollarAmount}` }}</h3>
+      <div>{{ currentClue.category }}</div>
+      <div>{{ `$${currentClue.dollarAmount}` }}</div>
+      <div>
+        <button @click="updateScore(currentClue.dollarAmount)">Correct</button>
+        <button @click="updateScore(-currentClue.dollarAmount)">Incorrect</button>
+        <button @click="clearClue">Clear</button>
+      </div>
     </div>
   </div>
 </template>
