@@ -4,11 +4,12 @@ import { reactive, ref } from 'vue';
 /* Interfaces */
 import type { Column } from '../interfaces/Column';
 
-const dollarAmountsFirst: number[] = [200, 400, 600, 800, 1000];
+/* Constants */
+import colors from '../constants/colors';
 
-const colorBlue: string = '#00f';
-const colorDollarAmount: string = '#f1c712';
-const colorWhite: string = '#fff';
+const { blue, dollarAmount, white } = colors;
+
+const dollarAmountsFirst: number[] = [200, 400, 600, 800, 1000];
 
 const currentClue = reactive<{ [key: string]: number | string }>({
   column: 0,
@@ -69,7 +70,7 @@ function selectClue(columnId: number, columnCategory: string, dollarAmount: numb
   gap: 1px;
 }
 .column {
-  color: v-bind('colorWhite');
+  color: v-bind('white');
   font-weight: 700;
 }
 .category {
@@ -80,7 +81,7 @@ function selectClue(columnId: number, columnCategory: string, dollarAmount: numb
   height: 3rem;
   font-weight: inherit;
   line-height: 1rem;
-  background: v-bind('colorBlue');
+  background: v-bind('blue');
 }
 .clue-button {
   display: flex;
@@ -91,7 +92,7 @@ function selectClue(columnId: number, columnCategory: string, dollarAmount: numb
   border: none;
   font-size: inherit;
   font-weight: inherit;
-  background-color: v-bind('colorBlue');
-  color: v-bind('colorDollarAmount');
+  background-color: v-bind('blue');
+  color: v-bind('dollarAmount');
 }
 </style>
