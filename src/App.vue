@@ -3,10 +3,11 @@
 /* Components */
 import HeaderComponent from './components/HeaderComponent.vue';
 
+const isHeaderDisplayed: boolean = false;
 </script>
 
 <template>
-  <HeaderComponent />
+  <HeaderComponent v-if="isHeaderDisplayed" />
   <main>
     <RouterView />
   </main>
