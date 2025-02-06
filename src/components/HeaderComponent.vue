@@ -28,6 +28,7 @@ function selectCategories() {
 .logo-and-categories {
   display: flex;
   justify-content: space-between;
+  width: 100%;
   padding-bottom: 1rem;
   font-size: 1.5rem;
 }
