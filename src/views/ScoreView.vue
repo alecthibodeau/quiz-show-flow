@@ -15,6 +15,7 @@ const { dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
 const currentRound = ref<number>(1);
 const currentScore = ref<number>(0);
 const isCategoriesFormDisplayed = ref<boolean>(false);
+const isNewRoundStart = ref<boolean>(true);
 
 const columns = reactive<Column[]>(Array.from({ length: 6 }, (_, id) => ({
   id,
@@ -41,6 +42,7 @@ function setGameBoardForRoundTwo(): void {
     column.dollarValues = dollarValuesSecond;
     resetColumnCategory(column);
   });
+  isNewRoundStart.value = true;
 }
 
 function selectClue(column: Column, dollarValue: number): void {
@@ -80,6 +82,7 @@ function updateScore(increment: number): void {
 
 function toggleCategories(): void {
   isCategoriesFormDisplayed.value = !isCategoriesFormDisplayed.value;
+  if (isNewRoundStart.value) isNewRoundStart.value = false;
 }
 
 function advanceRound(): void {
@@ -168,6 +171,13 @@ function formatScore(): string {
         </button>
       </div>
     </div>
+  </div>
+
+  <div v-if="isNewRoundStart" class="message-change-categories">
+    <div>
+      Click category names to change them.
+    </div>
+    <button @click="() => isNewRoundStart = false">close</button>
   </div>
 
   <div v-if="isCategoriesFormDisplayed" class="categories-form">
@@ -359,6 +369,24 @@ function formatScore(): string {
       left: .2rem;
       transform: rotate(-45deg);
     }
+  }
+}
+
+.message-change-categories {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-top: 1rem;
+  color: v-bind('colorOffWhite');
+
+  button {
+    border: none;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-size: .75rem;
+    font-weight: 700;
+    background-color: v-bind('colorOffWhite');
   }
 }
 
