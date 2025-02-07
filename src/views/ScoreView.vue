@@ -9,12 +9,12 @@ import type { Column } from '../interfaces/Column';
 import colors from '../constants/colors';
 import gameContent from '../constants/game-content';
 
-const { colorBlue, colorGold, colorGreenHTML, colorRed, colorOffWhite, colorOffBlack } = colors;
+const { colorBlue, colorBluePale, colorGold, colorGreenHTML, colorRed, colorOffWhite, colorOffBlack } = colors;
 const { dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
 
 const currentRound = ref<number>(1);
 const currentScore = ref<number>(0);
-const isCategoriesFormDisplayed = ref<boolean>(true);
+const isCategoriesFormDisplayed = ref<boolean>(false);
 
 const columns = reactive<Column[]>(Array.from({ length: 6 }, (_, id) => ({
   id,
@@ -180,11 +180,11 @@ function formatScore(): string {
       class="category-input"
     />
     <div class="categories-form-actions">
-      <button @click="clearCategories" class="button-app">
+      <button @click="clearCategories" class="button-app button-primary">
         Clear
       </button>
-      <button @click="toggleCategories" class="button-app">
-        Done
+      <button @click="toggleCategories" class="button-app button-primary">
+        Close
       </button>
     </div>
   </div>
@@ -194,20 +194,21 @@ function formatScore(): string {
 .button-app {
   font-size: .75rem;
   font-weight: 700;
-  border: 2px solid v-bind('colorOffBlack');
+  border: 2px solid transparent;
   border-radius: 5px;
   padding: .375rem;
+  background-color: v-bind('colorOffBlack');
+  color: v-bind('colorOffWhite');
 }
 
 .button-primary {
-  color: v-bind('colorOffWhite');
-  background-color: v-bind('colorOffBlack');
+  border-color: v-bind('colorOffWhite');
 }
 
 .button-secondary {
-  border-color: v-bind('colorOffWhite');
+  border-color: v-bind('colorBluePale');
   color: v-bind('colorOffBlack');
-  background-color: v-bind('colorOffWhite');
+  background-color: v-bind('colorBluePale');
 }
 
 .round-container {
@@ -296,7 +297,6 @@ function formatScore(): string {
 
 .clue-actions {
   display: flex;
-  gap: .5rem;
 }
 
 .clue-info {
@@ -320,7 +320,7 @@ function formatScore(): string {
   height: 2.5rem;
   border: none;
   border-radius: 50%;
-  margin-left: .25rem;
+  margin-left: 1rem;
 
   div {
     position: relative;
@@ -377,18 +377,6 @@ function formatScore(): string {
 
 .categories-form-actions {
   display: flex;
-  gap: .5rem;
-
-  button:first-of-type {
-    border-color: v-bind('colorRed');
-    background-color: v-bind('colorRed');
-    color: v-bind('colorOffWhite');
-  }
-
-  button:last-of-type {
-    border-color: v-bind('colorGreenHTML');
-    background-color: v-bind('colorGreenHTML');
-    color: v-bind('colorOffWhite');
-  }
+  gap: 1rem;
 }
 </style>
