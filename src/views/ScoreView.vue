@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 
 /* Interfaces */
 import type { Clue } from '../interfaces/Clue';
@@ -10,41 +10,50 @@ import colors from '../constants/colors';
 
 const { colorBlue, colorGold, colorOffWhite, colorOffBlack } = colors;
 
-const dollarAmountsFirst: number[] = [200, 400, 600, 800, 1000];
+const dollarValuesFirst: number[] = [200, 400, 600, 800, 1000];
+const dollarValuesSecond: number[] = dollarValuesFirst.map(amount => amount * 2);
 
 const currentRound = ref<number>(1);
 const currentScore = ref<number>(0);
 const isCategoriesFormDisplayed = ref<boolean>(false);
 
 const columns = reactive<Column[]>([
-  { id: 0, category: '', dollarAmounts: dollarAmountsFirst },
-  { id: 1, category: '', dollarAmounts: dollarAmountsFirst },
-  { id: 2, category: '', dollarAmounts: dollarAmountsFirst },
-  { id: 3, category: '', dollarAmounts: dollarAmountsFirst },
-  { id: 4, category: '', dollarAmounts: dollarAmountsFirst },
-  { id: 5, category: '', dollarAmounts: dollarAmountsFirst }
+  { id: 0, category: '', dollarValues: dollarValuesFirst },
+  { id: 1, category: '', dollarValues: dollarValuesFirst },
+  { id: 2, category: '', dollarValues: dollarValuesFirst },
+  { id: 3, category: '', dollarValues: dollarValuesFirst },
+  { id: 4, category: '', dollarValues: dollarValuesFirst },
+  { id: 5, category: '', dollarValues: dollarValuesFirst }
 ]);
 
 const currentClue = reactive<Clue>({
   column: 0,
   category: '',
-  dollarAmount: 0
+  dollarValue: 0
 });
 
-function selectClue(columnId: number, columnCategory: string, dollarAmount: number): void {
-  if (currentClue.column === columnId && currentClue.dollarAmount === dollarAmount) {
+watch(currentRound, (newRound) => {
+  if (newRound === 2) {
+    columns.forEach(column => {
+      column.dollarValues = dollarValuesSecond;
+    });
+  }
+});
+
+function selectClue(columnId: number, columnCategory: string, dollarValue: number): void {
+  if (currentClue.column === columnId && currentClue.dollarValue === dollarValue) {
     clearClue();
   } else {
     currentClue.column = columnId;
     currentClue.category = columnCategory;
-    currentClue.dollarAmount = dollarAmount;
+    currentClue.dollarValue = dollarValue;
   }
 }
 
 function clearClue(): void {
   currentClue.column = 0;
   currentClue.category = '';
-  currentClue.dollarAmount = 0;
+  currentClue.dollarValue = 0;
 }
 
 function updateScore(increment: number): void {
@@ -57,7 +66,7 @@ function toggleCategories(): void {
 }
 
 function advanceRound(): void {
-  currentRound.value += 1;
+  if (currentRound.value <= 2) currentRound.value += 1;
 }
 </script>
 
@@ -80,12 +89,12 @@ function advanceRound(): void {
           {{ column.category }}
         </div>
         <button
-          v-for="dollarAmount in column.dollarAmounts"
-          :key="`${column.id}-${dollarAmount}`"
-          @click="selectClue(column.id, column.category, dollarAmount)"
+          v-for="dollarValue in column.dollarValues"
+          :key="`${column.id}-${dollarValue}`"
+          @click="selectClue(column.id, column.category, dollarValue)"
           class="clue-button"
         >
-          {{ `$${dollarAmount}` }}
+          {{ `$${dollarValue}` }}
         </button>
       </div>
     </div>
@@ -101,10 +110,10 @@ function advanceRound(): void {
 
     <div v-if="currentClue.category && !isCategoriesFormDisplayed" class="current-clue">
       <div>{{ currentClue.category }}</div>
-      <div>{{ `$${currentClue.dollarAmount}` }}</div>
+      <div>{{ `$${currentClue.dollarValue}` }}</div>
       <div>
-        <button @click="updateScore(currentClue.dollarAmount)">Correct</button>
-        <button @click="updateScore(-currentClue.dollarAmount)">Incorrect</button>
+        <button @click="updateScore(currentClue.dollarValue)">Correct</button>
+        <button @click="updateScore(-currentClue.dollarValue)">Incorrect</button>
         <button @click="clearClue">Clear</button>
       </div>
     </div>
@@ -119,6 +128,9 @@ function advanceRound(): void {
       :placeholder="`Enter category ${column.id + 1}`"
       class="category-input"
     />
+    <button @click="toggleCategories" class="button-app button-primary">
+      Done
+    </button>
   </div>
 </template>
 
@@ -173,7 +185,7 @@ function advanceRound(): void {
   min-height: 3rem;
   padding: .125rem;
   text-align: center;
-  font-size: .5rem;
+  font-size: .625rem;
   font-weight: inherit;
   line-height: .75rem;
   background-color: v-bind('colorBlue');
@@ -205,10 +217,15 @@ function advanceRound(): void {
 }
 
 .categories-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: .5rem 2rem;
+  gap: .375rem;
 }
 
 .category-input {
   width: 100%;
+  max-width: 500px;
 }
 </style>
