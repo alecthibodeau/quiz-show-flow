@@ -21,16 +21,22 @@ const {
 } = colors;
 
 const { dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
+
 const formButtons: { [key: string]: string | (() => void) }[] = [
   { label: 'Clear', action: clearCategories },
   { label: 'Reset', action: resetColumns },
   { label: 'Close', action: toggleCategories }
 ];
 
+const clueResponses: string[] = ['correct', 'incorrect'];
+
 const currentRound = ref<number>(1);
 const currentScore = ref<number>(0);
 const isCategoriesFormDisplayed = ref<boolean>(false);
 const isNewRoundStart = ref<boolean>(true);
+const mostRecentResponse = ref<string>('');
+
+const playedClues = reactive<{ [key: string]: string }>({});
 
 const columns = reactive<Column[]>(Array.from({ length: 6 }, (_, id) => ({
   id,
@@ -43,8 +49,6 @@ const currentClue = reactive<Clue>({
   category: '',
   dollarValue: 0
 });
-
-const playedClues = reactive<{ [key: string]: string }>({});
 
 watch(currentRound, (newRound) => {
   if (newRound === 2) setGameBoardForRoundTwo();
@@ -64,6 +68,7 @@ function resetColumns(dollarValues?: number[]): void {
 function setGameBoardForRoundTwo(): void {
   resetColumns(dollarValuesSecond);
   isNewRoundStart.value = true;
+  mostRecentResponse.value = '';
 }
 
 function selectClue(column: Column, dollarValue: number): void {
@@ -97,7 +102,10 @@ function clearCategories(): void {
 
 function updateScore(increment: number): void {
   currentScore.value += increment;
-  playedClues[`${currentRound.value}-${currentClue.columnId}-${currentClue.dollarValue}`] = 'played';
+  const response: string = increment > 0 ? clueResponses[0] : clueResponses[1];
+  const clueKey: string = `${currentRound.value}-${currentClue.columnId}-${currentClue.dollarValue}`;
+  playedClues[clueKey] = increment > 0 ? '1' : '-1';
+  mostRecentResponse.value = response;
   clearClue();
 }
 
@@ -114,7 +122,8 @@ function startNewGame(): void {
   currentRound.value = 1;
   currentScore.value = 0;
   resetColumns(dollarValuesFirst);
-  toggleCategories();
+  Object.keys(playedClues).forEach(key => delete playedClues[key]);
+  mostRecentResponse.value = '';
 }
 
 function formatScore(): string {
@@ -177,12 +186,15 @@ function formatScore(): string {
           <div>{{ currentClue.category }}</div>
           <div>{{ `$${currentClue.dollarValue}` }}</div>
         </div>
+        <div v-else-if="mostRecentResponse" :class="`most-recent-response ${mostRecentResponse}`">
+          {{ mostRecentResponse.toUpperCase() }}
+        </div>
         <button
-          v-for="action of ['correct', 'incorrect']"
-          :key="`action-${action}`"
-          @click="updateScore(action === 'correct' ? currentClue.dollarValue : -currentClue.dollarValue)"
+          v-for="response of clueResponses"
+          :key="`response-button-${response}`"
+          @click="updateScore(response === 'correct' ? currentClue.dollarValue : -currentClue.dollarValue)"
           :disabled="!currentClue.dollarValue"
-          :class="[`button-response button-${action}`, { active: currentClue.dollarValue }]"
+          :class="[`button-response button-${response}`, { active: currentClue.dollarValue }]"
         >
           <div></div>
           <div></div>
@@ -344,6 +356,23 @@ function formatScore(): string {
 
   div {
     font-weight: 700;
+  }
+}
+
+.most-recent-response {
+  display: flex;
+  align-items: center;
+  font-size: .75rem;
+  font-weight: 700;
+
+  &.correct {
+    margin-right: .75rem;
+    color: v-bind('colorGreenHTML');
+  }
+
+  &.incorrect {
+    margin-right: .5rem;
+    color: v-bind('colorRed');
   }
 }
 
