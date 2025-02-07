@@ -9,7 +9,16 @@ import type { Column } from '../interfaces/Column';
 import colors from '../constants/colors';
 import gameContent from '../constants/game-content';
 
-const { colorBlue, colorBluePale, colorGold, colorGreenHTML, colorRed, colorOffWhite, colorOffBlack } = colors;
+const {
+  colorBlue,
+  colorBluePale,
+  colorGold,
+  colorGray,
+  colorGreenHTML,
+  colorRed,
+  colorOffWhite,
+  colorOffBlack
+} = colors;
 const { dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
 
 const currentRound = ref<number>(1);
@@ -159,13 +168,13 @@ function formatScore(): string {
         </div>
         <button
           @click="updateScore(currentClue.dollarValue)"
-          class="button-response button-correct">
+          :class="['button-response button-correct', { active: currentClue.dollarValue }]">
           <div></div>
           <div></div>
         </button>
         <button
           @click="updateScore(-currentClue.dollarValue)"
-          class="button-response button-incorrect">
+          :class="['button-response button-incorrect', { active: currentClue.dollarValue }]">
           <div></div>
           <div></div>
         </button>
@@ -312,28 +321,13 @@ function formatScore(): string {
 .clue-info {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: center;
   font-size: .75rem;
   line-height: 1rem;
 
   div {
     font-weight: 700;
-  }
-}
-
-.button-response {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: none;
-  border-radius: 50%;
-  margin-left: 1rem;
-
-  div {
-    position: relative;
   }
 }
 
@@ -372,19 +366,39 @@ function formatScore(): string {
   }
 }
 
+.button-response {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 50%;
+  margin-left: 1rem;
+
+  &:not(.active) {
+    background-color: v-bind('colorGray');
+  }
+
+  div {
+    position: relative;
+  }
+}
+
 .message-change-categories {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   margin-top: 1rem;
+  font-size: .875rem;
   color: v-bind('colorOffWhite');
 
   button {
     border: none;
     border-radius: 5px;
     text-transform: uppercase;
-    font-size: .75rem;
+    font-size: .625rem;
     font-weight: 700;
     background-color: v-bind('colorOffWhite');
   }
