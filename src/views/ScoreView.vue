@@ -8,7 +8,7 @@ import type { Column } from '../interfaces/Column';
 /* Constants */
 import colors from '../constants/colors';
 
-const { colorBlue, colorGold, colorOffWhite, colorOffBlack } = colors;
+const { colorBlue, colorGold, colorGreenHTML, colorRed, colorOffWhite, colorOffBlack } = colors;
 
 const dollarValuesFirst: number[] = [200, 400, 600, 800, 1000];
 const dollarValuesSecond: number[] = dollarValuesFirst.map(amount => amount * 2);
@@ -78,6 +78,14 @@ function startNewGame(): void {
     column.category = '';
   });
 }
+
+function formatScore(): string {
+  const absoluteScore: string = Math.abs(currentScore.value).toString();
+  const isLessThanThousand: boolean = absoluteScore.length < 4;
+  const formattedScore: string = absoluteScore.slice(0, -3) + ',' + absoluteScore.slice(-3);
+  const displayedScore: string = isLessThanThousand ? absoluteScore : formattedScore;
+  return `${currentScore.value < 0 ? '-' : ''}$${displayedScore}`;
+}
 </script>
 
 <template>
@@ -99,14 +107,14 @@ function startNewGame(): void {
         :key="`column-${column.id}`"
         class="column"
       >
-        <button @click="toggleCategories" class="category-button">
+        <button @click="toggleCategories" class="button-category">
           {{ column.category }}
         </button>
         <button
           v-for="dollarValue in column.dollarValues"
           :key="`${column.id}-${dollarValue}`"
           @click="selectClue(column.id, column.category, dollarValue)"
-          class="clue-button"
+          class="button-clue"
         >
           {{ `$${dollarValue}` }}
         </button>
@@ -114,19 +122,36 @@ function startNewGame(): void {
     </div>
 
     <div class="score-bar">
-      <div class="score-amount">
-        {{ `$${currentScore}` }}
+      <div class="score-info">
+        <div class="score-title">
+          score
+        </div>
+        <div
+          :class="['score-amount', { negative: currentScore < 0 }]"
+        >
+          {{ formatScore() }}
+        </div>
       </div>
-      <div
-        v-if="currentClue.category && !isCategoriesFormDisplayed"
-        class="clue-actions"
-      >
-        <div class="clue-info">
+      <div class="clue-actions">
+        <div
+          v-if="currentClue.category && !isCategoriesFormDisplayed"
+          class="clue-info"
+        >
           <div>{{ currentClue.category }}</div>
           <div>{{ `$${currentClue.dollarValue}` }}</div>
         </div>
-        <button @click="updateScore(currentClue.dollarValue)">Correct</button>
-        <button @click="updateScore(-currentClue.dollarValue)">Incorrect</button>
+        <button
+          @click="updateScore(currentClue.dollarValue)"
+          class="button-response button-correct">
+          <div></div>
+          <div></div>
+        </button>
+        <button
+          @click="updateScore(-currentClue.dollarValue)"
+          class="button-response button-incorrect">
+          <div></div>
+          <div></div>
+        </button>
       </div>
     </div>
   </div>
@@ -190,8 +215,8 @@ function startNewGame(): void {
   color: v-bind('colorOffWhite');
 }
 
-.category-button,
-.clue-button {
+.button-category,
+.button-clue {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -204,7 +229,7 @@ function startNewGame(): void {
   background-color: v-bind('colorBlue');
   color: v-bind('colorGold');
 
-  &.category-button {
+  &.button-category {
     min-height: 3rem;
     padding: .125rem;
     font-size: .625rem;
@@ -222,8 +247,23 @@ function startNewGame(): void {
   background-color: v-bind('colorGold');
 }
 
-.score-amount {
+.score-info > * {
   font-weight: 700;
+  line-height: 1rem;
+}
+
+.score-title {
+  text-transform: uppercase;
+  font-size: .75rem;
+}
+
+.score-amount {
+  padding: .125rem;
+  background-color: v-bind('colorOffWhite');
+
+  &.negative {
+    color: v-bind('colorRed');
+  }
 }
 
 .clue-actions {
@@ -236,6 +276,56 @@ function startNewGame(): void {
   flex-direction: column;
   align-items: flex-end;
   font-size: .75rem;
+}
+
+.button-response {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: 50%;
+  margin-left: .25rem;
+
+  div {
+    position: relative;
+  }
+}
+
+.button-correct {
+  background-color: v-bind('colorGreenHTML');
+
+  div {
+    width: .375rem;
+    height: 1.25rem;
+    background-color: v-bind('colorOffWhite');
+    transform: rotate(45deg);
+
+    &:first-of-type {
+      top: .12rem;
+      right: .11rem;
+      transform: rotate(-45deg);
+      height: .75rem;
+    }
+  }
+}
+
+.button-incorrect {
+  background-color: v-bind('colorRed');
+
+  div {
+    right: .2rem;
+    width: .375rem;
+    height: 1.75rem;
+    background-color: v-bind('colorOffWhite');
+    transform: rotate(45deg);
+
+    &:first-of-type {
+      left: .2rem;
+      transform: rotate(-45deg);
+    }
+  }
 }
 
 .categories-form {
