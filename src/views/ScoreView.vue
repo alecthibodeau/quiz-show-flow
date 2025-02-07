@@ -19,7 +19,13 @@ const {
   colorOffWhite,
   colorOffBlack
 } = colors;
+
 const { dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
+const formButtons: { [key: string]: string | (() => void) }[] = [
+  { label: 'Clear', action: clearCategories },
+  { label: 'Reset', action: resetColumns },
+  { label: 'Close', action: toggleCategories }
+];
 
 const currentRound = ref<number>(1);
 const currentScore = ref<number>(0);
@@ -38,6 +44,8 @@ const currentClue = reactive<Clue>({
   dollarValue: 0
 });
 
+const playedClues = reactive<{ [key: string]: string }>({});
+
 watch(currentRound, (newRound) => {
   if (newRound === 2) setGameBoardForRoundTwo();
 });
@@ -46,16 +54,19 @@ function resetColumnCategory(column: Column): void {
   column.category = `Category ${digitsAsWords[column.id]}`;
 }
 
-function setGameBoardForRoundTwo(): void {
+function resetColumns(dollarValues?: number[]): void {
   columns.forEach(column => {
-    column.dollarValues = dollarValuesSecond;
+    if (dollarValues) column.dollarValues = dollarValues;
     resetColumnCategory(column);
   });
+}
+
+function setGameBoardForRoundTwo(): void {
+  resetColumns(dollarValuesSecond);
   isNewRoundStart.value = true;
 }
 
 function selectClue(column: Column, dollarValue: number): void {
-  console.log('column.category: ', column.category)
   if (currentClue.columnId === column.id && currentClue.dollarValue === dollarValue) {
     clearClue();
   } else {
@@ -86,6 +97,7 @@ function clearCategories(): void {
 
 function updateScore(increment: number): void {
   currentScore.value += increment;
+  playedClues[`${currentRound.value}-${currentClue.columnId}-${currentClue.dollarValue}`] = 'played';
   clearClue();
 }
 
@@ -101,10 +113,7 @@ function advanceRound(): void {
 function startNewGame(): void {
   currentRound.value = 1;
   currentScore.value = 0;
-  columns.forEach(column => {
-    column.dollarValues = dollarValuesFirst;
-    resetColumnCategory(column);
-  });
+  resetColumns(dollarValuesFirst);
   toggleCategories();
 }
 
@@ -143,8 +152,10 @@ function formatScore(): string {
           v-for="dollarValue in column.dollarValues"
           :key="`${column.id}-${dollarValue}`"
           @click="selectClue(column, dollarValue)"
+          :disabled="!!playedClues[`${column.id}-${dollarValue}`]"
           :class="['button-clue', {
-            selected: column.id === currentClue.columnId && dollarValue === currentClue.dollarValue
+            selected: column.id === currentClue.columnId && dollarValue === currentClue.dollarValue,
+            played: playedClues[`${currentRound}-${column.id}-${dollarValue}`]
           }]"
         >
           {{ `$${dollarValue}` }}
@@ -167,14 +178,12 @@ function formatScore(): string {
           <div>{{ `$${currentClue.dollarValue}` }}</div>
         </div>
         <button
-          @click="updateScore(currentClue.dollarValue)"
-          :class="['button-response button-correct', { active: currentClue.dollarValue }]">
-          <div></div>
-          <div></div>
-        </button>
-        <button
-          @click="updateScore(-currentClue.dollarValue)"
-          :class="['button-response button-incorrect', { active: currentClue.dollarValue }]">
+          v-for="action of ['correct', 'incorrect']"
+          :key="`action-${action}`"
+          @click="updateScore(action === 'correct' ? currentClue.dollarValue : -currentClue.dollarValue)"
+          :disabled="!currentClue.dollarValue"
+          :class="[`button-response button-${action}`, { active: currentClue.dollarValue }]"
+        >
           <div></div>
           <div></div>
         </button>
@@ -194,16 +203,19 @@ function formatScore(): string {
       v-for="column of columns"
       :key="`input-${column.id}`"
       type="text"
+      maxlength="20"
       v-model="column.category"
       :placeholder="`Enter category #${column.id + 1}`"
       class="category-input"
     />
     <div class="categories-form-actions">
-      <button @click="clearCategories" class="button-app button-primary">
-        Clear
-      </button>
-      <button @click="toggleCategories" class="button-app button-primary">
-        Close
+      <button
+        v-for="formButton of formButtons"
+        :key="`formButton-${formButton.label}`"
+        @click="typeof formButton.action === 'function' && formButton.action()"
+        class="button-app button-primary"
+      >
+        {{ formButton.label }}
       </button>
     </div>
   </div>
@@ -282,13 +294,17 @@ function formatScore(): string {
     background-color: v-bind('colorGold');
     color: v-bind('colorOffBlack');
   }
+
+  &.played {
+    color: v-bind('colorBlue');
+  }
 }
 
 .score-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: .75rem;
   margin-top: 1px;
   background-color: v-bind('colorGold');
 }
@@ -374,7 +390,7 @@ function formatScore(): string {
   height: 2.5rem;
   border: none;
   border-radius: 50%;
-  margin-left: 1rem;
+  margin-left: .5rem;
 
   &:not(.active) {
     background-color: v-bind('colorGray');
@@ -409,7 +425,7 @@ function formatScore(): string {
   flex-direction: column;
   align-items: center;
   padding: .5rem 2rem;
-  gap: .375rem;
+  gap: .25rem;
 }
 
 .category-input {
@@ -420,5 +436,6 @@ function formatScore(): string {
 .categories-form-actions {
   display: flex;
   gap: 1rem;
+  margin-top: .25rem;
 }
 </style>

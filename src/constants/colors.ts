@@ -3,7 +3,7 @@ const colors = {
   colorBlue: '#0a0ae7',
   colorBluePale: '#a1a1ff',
   colorGold: '#f1c712',
-  colorGray: '#8a8a8a',
+  colorGray: '#9c9c9c',
   colorGreenHTML: '#008000',
   colorRed: '#d71010',
   colorWhite: '#fff',
