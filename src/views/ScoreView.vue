@@ -36,6 +36,7 @@ watch(currentRound, (newRound) => {
   if (newRound === 2) {
     columns.forEach(column => {
       column.dollarValues = dollarValuesSecond;
+      column.category = '';
     });
   }
 });
@@ -68,16 +69,29 @@ function toggleCategories(): void {
 function advanceRound(): void {
   if (currentRound.value <= 2) currentRound.value += 1;
 }
+
+function startNewGame(): void {
+  currentRound.value = 1;
+  currentScore.value = 0;
+  columns.forEach(column => {
+    column.dollarValues = dollarValuesFirst;
+    column.category = '';
+  });
+}
 </script>
 
 <template>
   <div class="score">
     <div class="round-container">
-      <button class="button-app button-secondary">info</button>
+      <button @click="startNewGame" class="button-app button-secondary">
+        New Game
+      </button>
       <div class="round">
         {{ `Round ${currentRound}` }}
       </div>
-      <button @click="advanceRound" class="button-app button-secondary">next</button>
+      <button @click="advanceRound" class="button-app button-secondary">
+        Next Round
+      </button>
     </div>
     <div class="game-board">
       <div
