@@ -7,54 +7,70 @@ import type { Column } from '../interfaces/Column';
 
 /* Constants */
 import colors from '../constants/colors';
+import gameContent from '../constants/game-content';
 
 const { colorBlue, colorGold, colorGreenHTML, colorRed, colorOffWhite, colorOffBlack } = colors;
-
-const dollarValuesFirst: number[] = [200, 400, 600, 800, 1000];
-const dollarValuesSecond: number[] = dollarValuesFirst.map(amount => amount * 2);
+const { dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
 
 const currentRound = ref<number>(1);
 const currentScore = ref<number>(0);
-const isCategoriesFormDisplayed = ref<boolean>(false);
+const isCategoriesFormDisplayed = ref<boolean>(true);
 
-const columns = reactive<Column[]>([
-  { id: 0, category: '', dollarValues: dollarValuesFirst },
-  { id: 1, category: '', dollarValues: dollarValuesFirst },
-  { id: 2, category: '', dollarValues: dollarValuesFirst },
-  { id: 3, category: '', dollarValues: dollarValuesFirst },
-  { id: 4, category: '', dollarValues: dollarValuesFirst },
-  { id: 5, category: '', dollarValues: dollarValuesFirst }
-]);
+const columns = reactive<Column[]>(Array.from({ length: 6 }, (_, id) => ({
+  id,
+  category: `Category ${digitsAsWords[id]}`,
+  dollarValues: dollarValuesFirst
+})));
 
 const currentClue = reactive<Clue>({
-  column: 0,
+  columnId: 0,
   category: '',
   dollarValue: 0
 });
 
 watch(currentRound, (newRound) => {
-  if (newRound === 2) {
-    columns.forEach(column => {
-      column.dollarValues = dollarValuesSecond;
-      column.category = '';
-    });
-  }
+  if (newRound === 2) setGameBoardForRoundTwo();
 });
 
-function selectClue(columnId: number, columnCategory: string, dollarValue: number): void {
-  if (currentClue.column === columnId && currentClue.dollarValue === dollarValue) {
+function resetColumnCategory(column: Column): void {
+  column.category = `Category ${digitsAsWords[column.id]}`;
+}
+
+function setGameBoardForRoundTwo(): void {
+  columns.forEach(column => {
+    column.dollarValues = dollarValuesSecond;
+    resetColumnCategory(column);
+  });
+}
+
+function selectClue(column: Column, dollarValue: number): void {
+  console.log('column.category: ', column.category)
+  if (currentClue.columnId === column.id && currentClue.dollarValue === dollarValue) {
     clearClue();
   } else {
-    currentClue.column = columnId;
-    currentClue.category = columnCategory;
+    currentClue.columnId = column.id;
+    currentClue.category = column.category;
     currentClue.dollarValue = dollarValue;
   }
 }
 
 function clearClue(): void {
-  currentClue.column = 0;
+  currentClue.columnId = 0;
   currentClue.category = '';
   currentClue.dollarValue = 0;
+}
+
+function focusFirstInput(): void {
+  const firstInput = document.querySelector('.category-input');
+  if (firstInput) (firstInput as HTMLInputElement).focus();
+}
+
+function clearCategories(): void {
+  columns.forEach(column => {
+    column.category = '';
+  });
+  currentClue.category = '';
+  focusFirstInput();
 }
 
 function updateScore(increment: number): void {
@@ -75,8 +91,9 @@ function startNewGame(): void {
   currentScore.value = 0;
   columns.forEach(column => {
     column.dollarValues = dollarValuesFirst;
-    column.category = '';
+    resetColumnCategory(column);
   });
+  toggleCategories();
 }
 
 function formatScore(): string {
@@ -95,7 +112,7 @@ function formatScore(): string {
         New Game
       </button>
       <div class="round">
-        {{ `Round ${currentRound}` }}
+        {{ `&#8226; Round ${currentRound} &#8226;` }}
       </div>
       <button @click="advanceRound" class="button-app button-secondary">
         Next Round
@@ -113,8 +130,10 @@ function formatScore(): string {
         <button
           v-for="dollarValue in column.dollarValues"
           :key="`${column.id}-${dollarValue}`"
-          @click="selectClue(column.id, column.category, dollarValue)"
-          class="button-clue"
+          @click="selectClue(column, dollarValue)"
+          :class="['button-clue', {
+            selected: column.id === currentClue.columnId && dollarValue === currentClue.dollarValue
+          }]"
         >
           {{ `$${dollarValue}` }}
         </button>
@@ -126,17 +145,12 @@ function formatScore(): string {
         <div class="score-title">
           score
         </div>
-        <div
-          :class="['score-amount', { negative: currentScore < 0 }]"
-        >
+        <div :class="['score-amount', { negative: currentScore < 0 }]">
           {{ formatScore() }}
         </div>
       </div>
       <div class="clue-actions">
-        <div
-          v-if="currentClue.category && !isCategoriesFormDisplayed"
-          class="clue-info"
-        >
+        <div v-if="currentClue.dollarValue" class="clue-info">
           <div>{{ currentClue.category }}</div>
           <div>{{ `$${currentClue.dollarValue}` }}</div>
         </div>
@@ -162,12 +176,17 @@ function formatScore(): string {
       :key="`input-${column.id}`"
       type="text"
       v-model="column.category"
-      :placeholder="`Enter category ${column.id + 1}`"
+      :placeholder="`Enter category #${column.id + 1}`"
       class="category-input"
     />
-    <button @click="toggleCategories" class="button-app button-primary">
-      Done
-    </button>
+    <div class="categories-form-actions">
+      <button @click="clearCategories" class="button-app">
+        Clear
+      </button>
+      <button @click="toggleCategories" class="button-app">
+        Done
+      </button>
+    </div>
   </div>
 </template>
 
@@ -186,6 +205,7 @@ function formatScore(): string {
 }
 
 .button-secondary {
+  border-color: v-bind('colorOffWhite');
   color: v-bind('colorOffBlack');
   background-color: v-bind('colorOffWhite');
 }
@@ -201,6 +221,7 @@ function formatScore(): string {
   text-align: center;
   text-transform: uppercase;
   font-weight: 700;
+  color: v-bind('colorGold');
 }
 
 .game-board {
@@ -236,6 +257,11 @@ function formatScore(): string {
     line-height: .75rem;
     color: v-bind('colorOffWhite');
   }
+
+  &.selected {
+    background-color: v-bind('colorGold');
+    color: v-bind('colorOffBlack');
+  }
 }
 
 .score-bar {
@@ -255,10 +281,12 @@ function formatScore(): string {
 .score-title {
   text-transform: uppercase;
   font-size: .75rem;
+  color: v-bind('colorBlue');
 }
 
 .score-amount {
   padding: .125rem;
+  border-radius: 5px;
   background-color: v-bind('colorOffWhite');
 
   &.negative {
@@ -275,7 +303,13 @@ function formatScore(): string {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  justify-content: flex-end;
   font-size: .75rem;
+  line-height: 1rem;
+
+  div {
+    font-weight: 700;
+  }
 }
 
 .button-response {
@@ -339,5 +373,22 @@ function formatScore(): string {
 .category-input {
   width: 100%;
   max-width: 500px;
+}
+
+.categories-form-actions {
+  display: flex;
+  gap: .5rem;
+
+  button:first-of-type {
+    border-color: v-bind('colorRed');
+    background-color: v-bind('colorRed');
+    color: v-bind('colorOffWhite');
+  }
+
+  button:last-of-type {
+    border-color: v-bind('colorGreenHTML');
+    background-color: v-bind('colorGreenHTML');
+    color: v-bind('colorOffWhite');
+  }
 }
 </style>

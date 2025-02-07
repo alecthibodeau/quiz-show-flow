@@ -1,5 +1,5 @@
 export interface Clue {
-  column: number;
+  columnId: number;
   category: string;
   dollarValue: number;
 };
