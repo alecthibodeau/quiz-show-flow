@@ -99,9 +99,9 @@ function startNewGame(): void {
         :key="`column-${column.id}`"
         class="column"
       >
-        <div class="category">
+        <button @click="toggleCategories" class="category-button">
           {{ column.category }}
-        </div>
+        </button>
         <button
           v-for="dollarValue in column.dollarValues"
           :key="`${column.id}-${dollarValue}`"
@@ -114,21 +114,19 @@ function startNewGame(): void {
     </div>
 
     <div class="score-bar">
-      <button @click="toggleCategories" class="button-app button-primary">
-        Categories
-      </button>
-      <span class="score-amount">
+      <div class="score-amount">
         {{ `$${currentScore}` }}
-      </span>
-    </div>
-
-    <div v-if="currentClue.category && !isCategoriesFormDisplayed" class="current-clue">
-      <div>{{ currentClue.category }}</div>
-      <div>{{ `$${currentClue.dollarValue}` }}</div>
-      <div>
+      </div>
+      <div
+        v-if="currentClue.category && !isCategoriesFormDisplayed"
+        class="clue-actions"
+      >
+        <div class="clue-info">
+          <div>{{ currentClue.category }}</div>
+          <div>{{ `$${currentClue.dollarValue}` }}</div>
+        </div>
         <button @click="updateScore(currentClue.dollarValue)">Correct</button>
         <button @click="updateScore(-currentClue.dollarValue)">Incorrect</button>
-        <button @click="clearClue">Clear</button>
       </div>
     </div>
   </div>
@@ -192,35 +190,33 @@ function startNewGame(): void {
   color: v-bind('colorOffWhite');
 }
 
-.category {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 3rem;
-  padding: .125rem;
-  text-align: center;
-  font-size: .625rem;
-  font-weight: inherit;
-  line-height: .75rem;
-  background-color: v-bind('colorBlue');
-}
-
+.category-button,
 .clue-button {
   display: flex;
   justify-content: center;
+  align-items: center;
   width: 100%;
   padding: .5rem 0;
   border: none;
   margin-top: 1px;
   font-size: .75rem;
-  font-weight: inherit;
+  font-weight: 700;
   background-color: v-bind('colorBlue');
   color: v-bind('colorGold');
+
+  &.category-button {
+    min-height: 3rem;
+    padding: .125rem;
+    font-size: .625rem;
+    line-height: .75rem;
+    color: v-bind('colorOffWhite');
+  }
 }
 
 .score-bar {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 1rem;
   margin-top: 1px;
   background-color: v-bind('colorGold');
@@ -228,6 +224,18 @@ function startNewGame(): void {
 
 .score-amount {
   font-weight: 700;
+}
+
+.clue-actions {
+  display: flex;
+  gap: .5rem;
+}
+
+.clue-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  font-size: .75rem;
 }
 
 .categories-form {
