@@ -42,6 +42,7 @@ const currentClue = reactive<Clue>({
 
 watch(currentRound, (newRound) => {
   if (newRound === 1) resetGameBoard(dollarValuesSecond);
+  if (newRound === 2) resetGameBoard();
 });
 
 function resetColumnCategory(column: Column): void {
@@ -55,11 +56,12 @@ function resetColumns(dollarValues?: number[]): void {
   });
 }
 
-function resetGameBoard(dollarValues: number[]): void {
-  resetColumns(dollarValues);
+function resetGameBoard(dollarValues?: number[]): void {
+  clearClue();
+  if (dollarValues) resetColumns(dollarValues);
+  if (isCategoriesFormDisplayed.value) isCategoriesFormDisplayed.value = false;
   isNewRoundStart.value = true;
   mostRecentResponse.value = '';
-  if (isCategoriesFormDisplayed.value) isCategoriesFormDisplayed.value = false;
 }
 
 function advanceRound(): void {
@@ -115,7 +117,6 @@ function updateScore(clueResponse: ClueResponse, increment: number): void {
   playedClues[clueKey] = clueResponse.code.toString();
   mostRecentResponse.value = clueResponse.name;
   clearClue();
-  console.log(playedClues);
 }
 
 function formatScore(): string {
