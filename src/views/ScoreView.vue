@@ -223,6 +223,3 @@ function formatScore(): string {
     </div>
   </div>
 </template>
-
-<style scoped>
-</style>
