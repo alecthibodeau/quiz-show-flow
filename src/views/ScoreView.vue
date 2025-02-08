@@ -3,6 +3,7 @@ import { reactive, ref, watch } from 'vue';
 
 /* Interfaces */
 import type { Clue } from '../interfaces/Clue';
+import type { ClueResponse } from '../interfaces/ClueResponse';
 import type { Column } from '../interfaces/Column';
 
 /* Constants */
@@ -11,7 +12,7 @@ import gameContent from '../constants/game-content';
 /* Styles */
 import '../styles/score-view.css';
 
-const { dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
+const { clueResponses, dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
 
 const formButtons: { [key: string]: string | (() => void) }[] = [
   { label: 'Clear', action: clearCategories },
@@ -19,9 +20,7 @@ const formButtons: { [key: string]: string | (() => void) }[] = [
   { label: 'Close', action: toggleCategories }
 ];
 
-const clueResponses: string[] = ['correct', 'incorrect'];
-
-const currentRound = ref<number>(1);
+const currentRound = ref<number>(0);
 const currentScore = ref<number>(0);
 const isCategoriesFormDisplayed = ref<boolean>(false);
 const isNewRoundStart = ref<boolean>(true);
@@ -42,7 +41,7 @@ const currentClue = reactive<Clue>({
 });
 
 watch(currentRound, (newRound) => {
-  if (newRound === 2) setGameBoardForRoundTwo();
+  if (newRound === 1) resetGameBoard();
 });
 
 function resetColumnCategory(column: Column): void {
@@ -56,10 +55,28 @@ function resetColumns(dollarValues?: number[]): void {
   });
 }
 
-function setGameBoardForRoundTwo(): void {
+function resetGameBoard(): void {
   resetColumns(dollarValuesSecond);
   isNewRoundStart.value = true;
   mostRecentResponse.value = '';
+  if (isCategoriesFormDisplayed.value) isCategoriesFormDisplayed.value = false;
+}
+
+function advanceRound(): void {
+  if (currentRound.value < 2) currentRound.value += 1;
+}
+
+function startNewGame(): void {
+  resetGameBoard();
+  currentRound.value = 0;
+  currentScore.value = 0;
+  Object.keys(playedClues).forEach(key => delete playedClues[key]);
+}
+
+function clearClue(): void {
+  currentClue.columnId = 0;
+  currentClue.category = '';
+  currentClue.dollarValue = 0;
 }
 
 function selectClue(column: Column, dollarValue: number): void {
@@ -70,16 +87,17 @@ function selectClue(column: Column, dollarValue: number): void {
     currentClue.category = column.category;
     currentClue.dollarValue = dollarValue;
   }
+  if (isNewRoundStart.value) isNewRoundStart.value = false;
+  if (isCategoriesFormDisplayed.value) isCategoriesFormDisplayed.value = false;
 }
 
-function clearClue(): void {
-  currentClue.columnId = 0;
-  currentClue.category = '';
-  currentClue.dollarValue = 0;
+function toggleCategories(): void {
+  isCategoriesFormDisplayed.value = !isCategoriesFormDisplayed.value;
+  if (isNewRoundStart.value) isNewRoundStart.value = false;
 }
 
 function focusFirstInput(): void {
-  const firstInput = document.querySelector('.category-input');
+  const firstInput: Element | null = document.querySelector('.category-input');
   if (firstInput) (firstInput as HTMLInputElement).focus();
 }
 
@@ -91,30 +109,13 @@ function clearCategories(): void {
   focusFirstInput();
 }
 
-function updateScore(increment: number): void {
-  currentScore.value += increment;
-  const response: string = increment > 0 ? clueResponses[0] : clueResponses[1];
+function updateScore(clueResponse: ClueResponse, increment: number): void {
+  if (increment) currentScore.value += increment;
   const clueKey: string = `${currentRound.value}-${currentClue.columnId}-${currentClue.dollarValue}`;
-  playedClues[clueKey] = increment > 0 ? '1' : '-1';
-  mostRecentResponse.value = response;
+  playedClues[clueKey] = clueResponse.code.toString();
+  mostRecentResponse.value = clueResponse.name;
   clearClue();
-}
-
-function toggleCategories(): void {
-  isCategoriesFormDisplayed.value = !isCategoriesFormDisplayed.value;
-  if (isNewRoundStart.value) isNewRoundStart.value = false;
-}
-
-function advanceRound(): void {
-  if (currentRound.value <= 2) currentRound.value += 1;
-}
-
-function startNewGame(): void {
-  currentRound.value = 1;
-  currentScore.value = 0;
-  resetColumns(dollarValuesFirst);
-  Object.keys(playedClues).forEach(key => delete playedClues[key]);
-  mostRecentResponse.value = '';
+  console.log(playedClues);
 }
 
 function formatScore(): string {
@@ -123,6 +124,13 @@ function formatScore(): string {
   const formattedScore: string = absoluteScore.slice(0, -3) + ',' + absoluteScore.slice(-3);
   const displayedScore: string = isLessThanThousand ? absoluteScore : formattedScore;
   return `${currentScore.value < 0 ? '-' : ''}$${displayedScore}`;
+}
+
+function formatIncrement(clueResponse: ClueResponse): number {
+  let increment: number = 0;
+  if (clueResponse.name === clueResponses.correct.name) increment = currentClue.dollarValue;
+  if (clueResponse.name === clueResponses.incorrect.name) increment = -currentClue.dollarValue;
+  return increment;
 }
 </script>
 
@@ -133,7 +141,7 @@ function formatScore(): string {
         New Game
       </button>
       <div class="round">
-        {{ `&#8226; Round ${currentRound} &#8226;` }}
+        {{ `&#8226; Round ${currentRound + 1} &#8226;` }}
       </div>
       <button @click="advanceRound" class="button-app button-secondary">
         Next Round
@@ -172,20 +180,16 @@ function formatScore(): string {
           {{ formatScore() }}
         </div>
       </div>
-      <div class="clue-actions">
-        <div v-if="currentClue.dollarValue" class="clue-info">
-          <div>{{ currentClue.category }}</div>
-          <div>{{ `$${currentClue.dollarValue}` }}</div>
-        </div>
-        <div v-else-if="mostRecentResponse" :class="`most-recent-response ${mostRecentResponse}`">
-          {{ mostRecentResponse.toUpperCase() }}
-        </div>
+      <div class="selected-clue-actions">
         <button
-          v-for="response of clueResponses"
-          :key="`response-button-${response}`"
-          @click="updateScore(response === 'correct' ? currentClue.dollarValue : -currentClue.dollarValue)"
+          v-for="clueResponse in clueResponses"
+          :key="`response-button-${clueResponse.name}`"
+          @click="updateScore(clueResponse, formatIncrement(clueResponse))"
           :disabled="!currentClue.dollarValue"
-          :class="[`button-response button-${response}`, { active: currentClue.dollarValue }]"
+          :class="[
+            `button-response button-${clueResponse.name}`,
+            { active: currentClue.dollarValue }
+          ]"
         >
           <div></div>
           <div></div>
@@ -194,14 +198,16 @@ function formatScore(): string {
     </div>
   </div>
 
-  <div v-if="isNewRoundStart" class="message-change-categories">
-    <div>
-      Click category names to change them.
+  <div v-if="!isCategoriesFormDisplayed && !isNewRoundStart" class="selected-clue-container">
+    <div v-if="currentClue.dollarValue" class="selected-clue-info">
+      {{ `${currentClue.category}: $${currentClue.dollarValue}` }}
     </div>
-    <button @click="() => isNewRoundStart = false">close</button>
+    <div v-else-if="mostRecentResponse" :class="`most-recent-response ${mostRecentResponse}`">
+      {{ mostRecentResponse.toUpperCase() }}
+    </div>
   </div>
 
-  <div v-if="isCategoriesFormDisplayed" class="categories-form">
+  <form v-if="isCategoriesFormDisplayed" class="categories-form">
     <input
       v-for="column of columns"
       :key="`input-${column.id}`"
@@ -221,5 +227,5 @@ function formatScore(): string {
         {{ formButton.label }}
       </button>
     </div>
-  </div>
+  </form>
 </template>
