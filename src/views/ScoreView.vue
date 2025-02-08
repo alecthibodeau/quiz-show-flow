@@ -28,7 +28,7 @@ const mostRecentResponse = ref<string>('');
 
 const playedClues = reactive<{ [key: string]: string }>({});
 
-const columns = reactive<Column[]>(Array.from({ length: 6 }, (_, id) => ({
+const columns = reactive<Column[]>(Array.from({ length: 6 }, (_, id: number) => ({
   id,
   category: `Category ${digitsAsWords[id]}`,
   dollarValues: dollarValuesFirst
@@ -41,7 +41,7 @@ const currentClue = reactive<Clue>({
 });
 
 watch(currentRound, (newRound) => {
-  if (newRound === 1) resetGameBoard();
+  if (newRound === 1) resetGameBoard(dollarValuesSecond);
 });
 
 function resetColumnCategory(column: Column): void {
@@ -55,8 +55,8 @@ function resetColumns(dollarValues?: number[]): void {
   });
 }
 
-function resetGameBoard(): void {
-  resetColumns(dollarValuesSecond);
+function resetGameBoard(dollarValues: number[]): void {
+  resetColumns(dollarValues);
   isNewRoundStart.value = true;
   mostRecentResponse.value = '';
   if (isCategoriesFormDisplayed.value) isCategoriesFormDisplayed.value = false;
@@ -67,7 +67,7 @@ function advanceRound(): void {
 }
 
 function startNewGame(): void {
-  resetGameBoard();
+  resetGameBoard(dollarValuesFirst);
   currentRound.value = 0;
   currentScore.value = 0;
   Object.keys(playedClues).forEach(key => delete playedClues[key]);
@@ -136,18 +136,22 @@ function formatIncrement(clueResponse: ClueResponse): number {
 
 <template>
   <div class="score">
-    <div class="round-container">
+    <div class="rounds-container">
       <button @click="startNewGame" class="button-app button-secondary">
         New Game
       </button>
       <div class="round">
         {{ `&#8226; Round ${currentRound + 1} &#8226;` }}
       </div>
-      <button @click="advanceRound" class="button-app button-secondary">
+      <button
+        @click="advanceRound"
+        class="button-app button-secondary"
+        :class="{ hidden: currentRound === 2 }"
+      >
         Next Round
       </button>
     </div>
-    <div class="game-board">
+    <div v-if="currentRound < 2" class="game-board">
       <div
         v-for="column in columns"
         :key="`column-${column.id}`"
