@@ -94,6 +94,7 @@ function selectClue(column: Column, dollarValue: number): void {
 }
 
 function toggleCategories(): void {
+  clearClue();
   isCategoriesFormDisplayed.value = !isCategoriesFormDisplayed.value;
   if (isNewRoundStart.value) isNewRoundStart.value = false;
 }
@@ -185,7 +186,7 @@ function formatIncrement(clueResponse: ClueResponse): number {
           {{ formatScore() }}
         </div>
       </div>
-      <div class="selected-clue-actions">
+      <div v-if="!isCategoriesFormDisplayed" class="selected-clue-actions">
         <button
           v-for="clueResponse in clueResponses"
           :key="`response-button-${clueResponse.name}`"
