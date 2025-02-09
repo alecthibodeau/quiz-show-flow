@@ -204,7 +204,7 @@ function formatIncrement(clueResponse: ClueResponse): number {
     </div>
   </div>
 
-  <div v-if="!isCategoriesFormDisplayed && !isNewRoundStart" class="selected-clue-container">
+  <div v-if="!isCategoriesFormDisplayed && !isNewRoundStart" class="info-box">
     <div v-if="currentClue.dollarValue" class="selected-clue-info">
       {{ `${currentClue.category}: $${currentClue.dollarValue}` }}
     </div>
@@ -221,7 +221,7 @@ function formatIncrement(clueResponse: ClueResponse): number {
       maxlength="20"
       v-model="column.category"
       :placeholder="`Enter category #${column.id + 1}`"
-      class="category-input"
+      class="categories-form-input"
     />
     <div class="categories-form-actions">
       <button
