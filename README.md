@@ -1,61 +1,31 @@
-# quiz-show-flow
+# Quiz Show Flow
 
-This template should help get you started developing with Vue 3 in Vite.
+## The User Experience
 
-## Recommended IDE Setup
+Quiz Show Flow is an interface for scoring your progress while playing along with the televised game show *Jeopardy!* It's a work in progress. Check back for updates.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## Features
 
-## Type Support for `.vue` Imports in TS
+### Current features
+- Click category names to edit them
+- Advance to next round when ready
+- Start new game at any time
+- Scoring shows negative amounts in red
+- Record your clue reponse in three ways&hellip;
+  - Correct: Checkmark icon button (green) &mdash; score increases
+  - Incorrect: "X" icon button (red) &mdash; score decreases
+  - Pass: Circle icon button (blue) &mdash; score stays the same
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+### Future features
+- Betting: Place wagers in the second and final rounds
+- History: Save your score results
 
-## Customize configuration
+## Technologies
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+Quiz Show Flow is built with:
+- [Vue](https://vuejs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vite.dev/)
+- vanilla CSS
 
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Run End-to-End Tests with [Cypress](https://www.cypress.io/)
-
-```sh
-npm run test:e2e:dev
-```
-
-This runs the end-to-end tests against the Vite development server.
-It is much faster than the production build.
-
-But it's still recommended to test the production build with `test:e2e` before deploying (e.g. in CI environments):
-
-```sh
-npm run build
-npm run test:e2e
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+Software and content Copyright (C) Alec Thibodeau. Copyright year is by commit date. This project has no affiliation with the *Jeopardy!* television show or its producers.
