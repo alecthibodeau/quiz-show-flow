@@ -112,9 +112,17 @@ function clearCategories(): void {
   focusFirstInput();
 }
 
+function formatClueKey(columnId: number, dollarValue: number): string {
+  return `${currentRound.value}-${columnId}-${dollarValue}`;
+}
+
+function isCluePlayed(columnId: number, dollarValue: number): boolean {
+  return !!playedClues[formatClueKey(columnId, dollarValue)];
+}
+
 function updateScore(clueResponse: ClueResponse, increment: number): void {
   if (increment) currentScore.value += increment;
-  const clueKey: string = `${currentRound.value}-${currentClue.columnId}-${currentClue.dollarValue}`;
+  const clueKey: string = formatClueKey(currentClue.columnId, currentClue.dollarValue);
   playedClues[clueKey] = clueResponse.code.toString();
   mostRecentResponse.value = clueResponse.name;
   clearClue();
@@ -128,10 +136,10 @@ function formatScore(): string {
   return `${currentScore.value < 0 ? '-' : ''}$${displayedScore}`;
 }
 
-function formatIncrement(clueResponse: ClueResponse): number {
+function formatScoringIncrement(name: string): number {
   let increment: number = 0;
-  if (clueResponse.name === clueResponses.correct.name) increment = currentClue.dollarValue;
-  if (clueResponse.name === clueResponses.incorrect.name) increment = -currentClue.dollarValue;
+  if (name === clueResponses.correct.name) increment = currentClue.dollarValue;
+  if (name === clueResponses.incorrect.name) increment = -currentClue.dollarValue;
   return increment;
 }
 </script>
@@ -166,10 +174,10 @@ function formatIncrement(clueResponse: ClueResponse): number {
           v-for="dollarValue in column.dollarValues"
           :key="`${column.id}-${dollarValue}`"
           @click="selectClue(column, dollarValue)"
-          :disabled="!!playedClues[`${column.id}-${dollarValue}`]"
+          :disabled="isCluePlayed(column.id, dollarValue)"
           :class="['button-clue', {
             selected: column.id === currentClue.columnId && dollarValue === currentClue.dollarValue,
-            played: playedClues[`${currentRound}-${column.id}-${dollarValue}`]
+            played: isCluePlayed(column.id, dollarValue)
           }]"
         >
           {{ `$${dollarValue}` }}
@@ -190,7 +198,7 @@ function formatIncrement(clueResponse: ClueResponse): number {
         <button
           v-for="clueResponse in clueResponses"
           :key="`response-button-${clueResponse.name}`"
-          @click="updateScore(clueResponse, formatIncrement(clueResponse))"
+          @click="updateScore(clueResponse, formatScoringIncrement(clueResponse.name))"
           :disabled="!currentClue.dollarValue"
           :class="[
             `button-response button-${clueResponse.name}`,
