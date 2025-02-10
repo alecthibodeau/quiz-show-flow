@@ -213,7 +213,7 @@ function formatIncrement(clueResponse: ClueResponse): number {
     </div>
   </div>
 
-  <form v-if="isCategoriesFormDisplayed" class="categories-form">
+  <div v-if="isCategoriesFormDisplayed" class="categories-form">
     <input
       v-for="column of columns"
       :key="`input-${column.id}`"
@@ -233,5 +233,5 @@ function formatIncrement(clueResponse: ClueResponse): number {
         {{ formButton.label }}
       </button>
     </div>
-  </form>
+  </div>
 </template>
