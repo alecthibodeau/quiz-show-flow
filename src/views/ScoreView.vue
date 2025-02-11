@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref } from 'vue';
 
 /* Interfaces */
 import type { Clue } from '../interfaces/Clue';
@@ -14,17 +14,16 @@ import '../styles/score-view.css';
 
 const {
   clueResponses,
+  digitsAsWords,
   dollarValuesFirst,
   dollarValuesSecond,
   initialColumns,
-  initialCurrentClue,
-  setDefaultColumnCategory
+  initialCurrentClue
 } = gameContent;
 
 const formButtons: { label: string, action: () => void }[] = [
-  { label: 'Clear', action: clearCategories },
-  { label: 'Reset', action: resetColumns },
-  { label: 'Close', action: toggleCategories }
+  { label: 'clear', action: clearCategories },
+  { label: 'continue', action: toggleCategories }
 ];
 
 const columns = reactive<Column[]>(initialColumns);
@@ -36,38 +35,32 @@ const isNewRoundStart = ref<boolean>(true);
 const mostRecentResponse = ref<string>('');
 const playedClues = reactive<{ [key: string]: string }>({});
 
-watch(currentRound, (newRound) => {
-  if (newRound === 1) resetGameBoard(dollarValuesSecond);
-  if (newRound === 2) resetGameBoard();
-});
-
-function resetColumnCategory(column: Column): void {
-  column.category = setDefaultColumnCategory(column.id);
-}
-
-function resetColumns(dollarValues? : number[]): void {
+function resetColumns(): void {
   columns.forEach(column => {
-    if (dollarValues) column.dollarValues = dollarValues;
-    resetColumnCategory(column);
+    column.dollarValues = currentRound.value === 0 ? dollarValuesFirst : dollarValuesSecond;
+    column.category = '';
   });
 }
 
-function resetGameBoard(dollarValues?: number[]): void {
+function resetGameBoard(): void {
   clearClue();
-  if (dollarValues) resetColumns(dollarValues);
+  resetColumns();
   if (isCategoriesFormDisplayed.value) isCategoriesFormDisplayed.value = false;
   isNewRoundStart.value = true;
   mostRecentResponse.value = '';
 }
 
 function advanceRound(): void {
-  if (currentRound.value < 2) currentRound.value += 1;
+  if (currentRound.value < 2) {
+    currentRound.value += 1;
+    resetGameBoard();
+  }
 }
 
 function startNewGame(): void {
-  resetGameBoard(dollarValuesFirst);
   currentRound.value = 0;
   currentScore.value = 0;
+  resetGameBoard();
   Object.keys(playedClues).forEach(key => delete playedClues[key]);
 }
 
@@ -95,17 +88,11 @@ function toggleCategories(): void {
   if (isNewRoundStart.value) isNewRoundStart.value = false;
 }
 
-function focusFirstInput(): void {
-  const firstInput: Element | null = document.querySelector('.category-input');
-  if (firstInput) (firstInput as HTMLInputElement).focus();
-}
-
 function clearCategories(): void {
   columns.forEach(column => {
     column.category = '';
   });
   currentClue.category = '';
-  focusFirstInput();
 }
 
 function formatClueKey(columnId: number, dollarValue: number): string {
@@ -138,6 +125,14 @@ function formatScoringIncrement(name: string): number {
   if (name === clueResponses.incorrect.name) increment = -currentClue.dollarValue;
   return increment;
 }
+
+function setPlaceholderCategory(columnId: number): string {
+  return `Category ${digitsAsWords[columnId]}`;
+}
+
+function displayCategory(category: string, columnId: number): string {
+  return category ? category : setPlaceholderCategory(columnId);
+}
 </script>
 
 <template>
@@ -164,7 +159,7 @@ function formatScoringIncrement(name: string): number {
         class="column"
       >
         <button @click="toggleCategories" class="button-category">
-          {{ column.category }}
+          {{ displayCategory(column.category, column.id) }}
         </button>
         <button
           v-for="dollarValue in column.dollarValues"
@@ -210,7 +205,10 @@ function formatScoringIncrement(name: string): number {
 
   <div v-if="!isCategoriesFormDisplayed && !isNewRoundStart" class="info-box">
     <div v-if="currentClue.dollarValue" class="selected-clue-info">
-      {{ `${currentClue.category}: $${currentClue.dollarValue}` }}
+      {{ `
+        ${displayCategory(currentClue.category, currentClue.columnId)}: $
+        ${currentClue.dollarValue}
+      ` }}
     </div>
     <div v-else-if="mostRecentResponse" :class="`most-recent-response ${mostRecentResponse}`">
       {{ mostRecentResponse.toUpperCase() }}
@@ -224,7 +222,7 @@ function formatScoringIncrement(name: string): number {
       type="text"
       maxlength="20"
       v-model="column.category"
-      :placeholder="`Enter category #${column.id + 1}`"
+      :placeholder="`Enter ${setPlaceholderCategory(column.id)}`"
       class="categories-form-input"
     />
     <div class="categories-form-actions">
@@ -232,9 +230,9 @@ function formatScoringIncrement(name: string): number {
         v-for="formButton of formButtons"
         :key="`formButton-${formButton.label}`"
         @click="typeof formButton.action === 'function' && formButton.action()"
-        class="button-app button-primary"
+        :class="`button-app button-primary button-${formButton.label}`"
       >
-        {{ formButton.label }}
+        {{ formButton.label.charAt(0).toUpperCase() + formButton.label.slice(1) }}
       </button>
     </div>
   </div>

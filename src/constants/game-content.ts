@@ -15,7 +15,7 @@ const dollarValuesSecond: number[] = dollarValuesFirst.map(amount => amount * 2)
 
 const initialColumns: Column[] = Array.from({ length: 6 }, (_, columnId: number) => ({
   id: columnId,
-  category: setDefaultColumnCategory(columnId),
+  category: '',
   dollarValues: dollarValuesFirst
 }));
 
@@ -25,18 +25,13 @@ const initialCurrentClue: Clue = {
   dollarValue: 0
 };
 
-function setDefaultColumnCategory(columnId: number): string {
-  return `Category ${digitsAsWords[columnId]}`;
-}
-
 const gameContent = {
   clueResponses,
   digitsAsWords,
   dollarValuesFirst,
   dollarValuesSecond,
   initialColumns,
-  initialCurrentClue,
-  setDefaultColumnCategory
+  initialCurrentClue
 };
 
 export default gameContent;

@@ -16,6 +16,16 @@
 
 .button-primary {
   border-color: var(--color-off-white);
+
+  &.button-clear {
+    border-color: var(--color-red);
+    background-color: var(--color-red);
+  }
+
+  &.button-continue {
+    border-color: var(--color-green-dark);
+    background-color: var(--color-green-dark);
+  }
 }
 
 .button-secondary {
