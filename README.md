@@ -16,13 +16,15 @@ Currently there's no option to wager money on Daily Doubles or in the final roun
 - Category names by default are *Category One*, *Category Two*, etc.
 - Click category names to edit them: enter your interpretation of the show's actual categories.
 - Click any available clue on the board to select it
-- Played clues display as empty blue rectangles &mdash; just like on the show
-- Your score automatically updates after each clue response
+- Played clues display as empty blue rectangles within the game board &mdash; just like on the show
 - Negative scores display as red numbers
 - Record your clue responses with one of three buttons in the score bar&hellip;
   - Correct: Checkmark icon button (green) &mdash; score increases
   - Incorrect: "X" icon button (red) &mdash; score decreases
   - Pass: Circle icon button (blue) &mdash; score stays the same
+- After each clue response&hellip;
+  - Your score automatically updates
+  - Your most recent response status (correct, incorrect or pass) appears below the score bar
 
 ### Future features
 - Betting: Place wagers for Daily Doubles and for the final round
