@@ -12,33 +12,29 @@ import gameContent from '../constants/game-content';
 /* Styles */
 import '../styles/score-view.css';
 
-const { clueResponses, dollarValuesFirst, dollarValuesSecond, digitsAsWords } = gameContent;
+const {
+  clueResponses,
+  dollarValuesFirst,
+  dollarValuesSecond,
+  initialColumns,
+  initialCurrentClue,
+  setDefaultColumnCategory
+} = gameContent;
 
-const formButtons: { [key: string]: string | (() => void) }[] = [
+const formButtons: { label: string, action: () => void }[] = [
   { label: 'Clear', action: clearCategories },
   { label: 'Reset', action: resetColumns },
   { label: 'Close', action: toggleCategories }
 ];
 
+const columns = reactive<Column[]>(initialColumns);
+const currentClue = reactive<Clue>({...initialCurrentClue});
 const currentRound = ref<number>(0);
 const currentScore = ref<number>(0);
 const isCategoriesFormDisplayed = ref<boolean>(false);
 const isNewRoundStart = ref<boolean>(true);
 const mostRecentResponse = ref<string>('');
-
 const playedClues = reactive<{ [key: string]: string }>({});
-
-const columns = reactive<Column[]>(Array.from({ length: 6 }, (_, id: number) => ({
-  id,
-  category: `Category ${digitsAsWords[id]}`,
-  dollarValues: dollarValuesFirst
-})));
-
-const currentClue = reactive<Clue>({
-  columnId: 0,
-  category: '',
-  dollarValue: 0
-});
 
 watch(currentRound, (newRound) => {
   if (newRound === 1) resetGameBoard(dollarValuesSecond);
@@ -46,10 +42,10 @@ watch(currentRound, (newRound) => {
 });
 
 function resetColumnCategory(column: Column): void {
-  column.category = `Category ${digitsAsWords[column.id]}`;
+  column.category = setDefaultColumnCategory(column.id);
 }
 
-function resetColumns(dollarValues?: number[]): void {
+function resetColumns(dollarValues? : number[]): void {
   columns.forEach(column => {
     if (dollarValues) column.dollarValues = dollarValues;
     resetColumnCategory(column);
@@ -76,9 +72,9 @@ function startNewGame(): void {
 }
 
 function clearClue(): void {
-  currentClue.columnId = 0;
-  currentClue.category = '';
-  currentClue.dollarValue = 0;
+  currentClue.columnId = initialCurrentClue.columnId;
+  currentClue.category = initialCurrentClue.category;
+  currentClue.dollarValue = initialCurrentClue.dollarValue;
 }
 
 function selectClue(column: Column, dollarValue: number): void {
