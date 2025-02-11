@@ -234,6 +234,7 @@
 .categories-form-input {
   width: 100%;
   max-width: 180px;
+  font-size: 1rem;
 }
 
 .categories-form-actions {
