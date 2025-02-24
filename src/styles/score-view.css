@@ -69,13 +69,14 @@
 .button-category {
   min-height: 3rem;
   padding: .125rem;
+  overflow-wrap: anywhere;
   font-size: .625rem;
   line-height: .75rem;
   color: var(--color-off-white);
 }
 
 .button-clue {
-  padding: .5rem 0;
+  padding: .875rem 0;
   font-size: .75rem;
   color: var(--color-gold);
 
