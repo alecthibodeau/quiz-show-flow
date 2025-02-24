@@ -21,6 +21,10 @@
     height: 1.25rem;
     transform: rotate(45deg);
 
+    span {
+      display: none;
+    }
+
     &:first-of-type {
       top: .12rem;
       right: .11rem;
@@ -38,6 +42,10 @@
     height: 1.75rem;
     transform: rotate(45deg);
 
+    span {
+      display: none;
+    }
+
     &:first-of-type {
       left: .2rem;
       transform: rotate(-45deg);
@@ -54,9 +62,18 @@
     border-radius: 50%;
     border: .375rem solid var(--color-off-white);
     background-color: var(--color-blue);
+    color: transparent;
 
     &:first-of-type {
       display: none;
+    }
+
+    &.mobile {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5rem;
+      color: var(--color-off-white);
     }
   }
 }
