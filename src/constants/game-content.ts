@@ -4,9 +4,9 @@ import type { ClueResponse } from '../interfaces/ClueResponse';
 import type { Column } from '../interfaces/Column';
 
 const clueResponses: { [key: string]: ClueResponse } = {
-  correct: { name: 'correct', code: 1 },
-  incorrect: { name: 'incorrect', code: -1 },
-  pass: { name: 'pass', code: 0 }
+  correct: { name: 'correct', scoringIncrementCode: 1 },
+  incorrect: { name: 'incorrect', scoringIncrementCode: -1 },
+  pass: { name: 'pass', scoringIncrementCode: 0 }
 };
 
 const digitsAsWords: string[] = ['One', 'Two', 'Three', 'Four', 'Five', 'Six'];

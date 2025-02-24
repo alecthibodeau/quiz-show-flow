@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue';
 
+/* Components */
+import ButtonResponse from '@/components/ButtonResponse.vue';
+
 /* Interfaces */
 import type { Clue } from '../interfaces/Clue';
 import type { ClueResponse } from '../interfaces/ClueResponse';
@@ -8,6 +11,9 @@ import type { Column } from '../interfaces/Column';
 
 /* Constants */
 import gameContent from '../constants/game-content';
+
+/* Helpers */
+import scoreFormatting from '@/helpers/score-formatting';
 
 /* Styles */
 import '../styles/score-view.css';
@@ -20,6 +26,8 @@ const {
   initialColumns,
   initialCurrentClue
 } = gameContent;
+
+const { formatDisplayedScore, formatDollarsDifference } = scoreFormatting;
 
 const formButtons: { label: string, action: () => void }[] = [
   { label: 'clear', action: clearCategories },
@@ -103,27 +111,13 @@ function isCluePlayed(columnId: number, dollarValue: number): boolean {
   return !!playedClues[formatClueKey(columnId, dollarValue)];
 }
 
-function updateScore(clueResponse: ClueResponse, increment: number): void {
-  if (increment) currentScore.value += increment;
+function updateScore(clueResponse: ClueResponse): void {
+  const dollarAmount: number = formatDollarsDifference(clueResponse.name, currentClue.dollarValue);
+  currentScore.value += dollarAmount;
   const clueKey: string = formatClueKey(currentClue.columnId, currentClue.dollarValue);
-  playedClues[clueKey] = clueResponse.code.toString();
+  playedClues[clueKey] = clueResponse.scoringIncrementCode.toString();
   mostRecentResponse.value = clueResponse.name;
   clearClue();
-}
-
-function formatScore(): string {
-  const absoluteScore: string = Math.abs(currentScore.value).toString();
-  const isLessThanThousand: boolean = absoluteScore.length < 4;
-  const formattedScore: string = absoluteScore.slice(0, -3) + ',' + absoluteScore.slice(-3);
-  const displayedScore: string = isLessThanThousand ? absoluteScore : formattedScore;
-  return `${currentScore.value < 0 ? '-' : ''}$${displayedScore}`;
-}
-
-function formatScoringIncrement(name: string): number {
-  let increment: number = 0;
-  if (name === clueResponses.correct.name) increment = currentClue.dollarValue;
-  if (name === clueResponses.incorrect.name) increment = -currentClue.dollarValue;
-  return increment;
 }
 
 function setPlaceholderCategory(columnId: number): string {
@@ -155,7 +149,7 @@ function displayCategory(category: string, columnId: number): string {
     <div v-if="currentRound < 2" class="game-board">
       <div
         v-for="column in columns"
-        :key="`column-${column.id}`"
+        :key="`column${column.id}`"
         class="column"
       >
         <button @click="toggleCategories" class="button-category">
@@ -163,7 +157,7 @@ function displayCategory(category: string, columnId: number): string {
         </button>
         <button
           v-for="dollarValue in column.dollarValues"
-          :key="`${column.id}-${dollarValue}`"
+          :key="`${column.id}${dollarValue}`"
           @click="selectClue(column, dollarValue)"
           :disabled="isCluePlayed(column.id, dollarValue)"
           :class="['button-clue', {
@@ -182,23 +176,20 @@ function displayCategory(category: string, columnId: number): string {
           score
         </div>
         <div :class="['score-amount', { negative: currentScore < 0 }]">
-          {{ formatScore() }}
+          {{ formatDisplayedScore(currentScore) }}
         </div>
       </div>
-      <div v-if="!isCategoriesFormDisplayed" class="selected-clue-actions">
-        <button
-          v-for="clueResponse in clueResponses"
-          :key="`response-button-${clueResponse.name}`"
-          @click="updateScore(clueResponse, formatScoringIncrement(clueResponse.name))"
-          :disabled="!currentClue.dollarValue"
-          :class="[
-            `button-response button-${clueResponse.name}`,
-            { active: currentClue.dollarValue }
-          ]"
+      <div v-if="!isCategoriesFormDisplayed && currentClue.dollarValue"
+        class="response-buttons-container"
+      >
+        <div v-for="clueResponse in clueResponses"
+          :key="`buttonResponse${clueResponse.name}`"
         >
-          <div></div>
-          <div></div>
-        </button>
+          <ButtonResponse
+            :clueResponse="clueResponse"
+            @onClickButton="updateScore(clueResponse)"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -210,7 +201,9 @@ function displayCategory(category: string, columnId: number): string {
         ${currentClue.dollarValue}
       ` }}
     </div>
-    <div v-else-if="mostRecentResponse" :class="`most-recent-response ${mostRecentResponse}`">
+    <div v-else-if="mostRecentResponse"
+      :class="`most-recent-response ${mostRecentResponse}`"
+    >
       {{ mostRecentResponse.toUpperCase() }}
     </div>
   </div>
@@ -218,7 +211,7 @@ function displayCategory(category: string, columnId: number): string {
   <div v-if="isCategoriesFormDisplayed" class="categories-form">
     <input
       v-for="column of columns"
-      :key="`input-${column.id}`"
+      :key="`input${column.id}`"
       type="text"
       maxlength="20"
       v-model="column.category"
@@ -228,7 +221,7 @@ function displayCategory(category: string, columnId: number): string {
     <div class="categories-form-actions">
       <button
         v-for="formButton of formButtons"
-        :key="`formButton-${formButton.label}`"
+        :key="`formButton${formButton.label}`"
         @click="typeof formButton.action === 'function' && formButton.action()"
         :class="`button-app button-primary button-${formButton.label}`"
       >

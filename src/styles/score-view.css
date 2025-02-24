@@ -122,8 +122,9 @@
   }
 }
 
-.selected-clue-actions {
+.response-buttons-container {
   display: flex;
+  gap: 1.75rem;
 }
 
 .button-response {
@@ -134,14 +135,6 @@
   height: 2.5rem;
   border: none;
   border-radius: .5rem;
-
-  &:not(:first-of-type) {
-    margin-left: 1.75rem;
-  }
-
-  &:not(.active) {
-    display: none;
-  }
 
   div {
     position: relative;
