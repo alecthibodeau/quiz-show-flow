@@ -1,0 +1,62 @@
+.button-response {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: none;
+  border-radius: .5rem;
+
+  div {
+    position: relative;
+    width: .375rem;
+    background-color: var(--color-off-white);
+  }
+}
+
+.button-correct {
+  background-color: var(--color-green-dark);
+
+  div {
+    height: 1.25rem;
+    transform: rotate(45deg);
+
+    &:first-of-type {
+      top: .12rem;
+      right: .11rem;
+      transform: rotate(-45deg);
+      height: .75rem;
+    }
+  }
+}
+
+.button-incorrect {
+  background-color: var(--color-red);
+
+  div {
+    right: .2rem;
+    height: 1.75rem;
+    transform: rotate(45deg);
+
+    &:first-of-type {
+      left: .2rem;
+      transform: rotate(-45deg);
+    }
+  }
+}
+
+.button-pass {
+  background-color: var(--color-blue);
+
+  div {
+    height: 1.5rem;
+    width: 1.5rem;
+    border-radius: 50%;
+    border: .375rem solid var(--color-off-white);
+    background-color: var(--color-blue);
+
+    &:first-of-type {
+      display: none;
+    }
+  }
+}

@@ -4,7 +4,7 @@
 import type { ClueResponse } from '@/interfaces/ClueResponse';
 
 /* Styles */
-import '../styles/score-view.css';
+import '../styles/button-response.css';
 
 const props = defineProps<{
   clueResponse: ClueResponse
