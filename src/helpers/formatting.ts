@@ -1,7 +1,29 @@
 /* Constants */
 import gameContent from '../constants/game-content';
 
-const { clueResponses } = gameContent;
+const { clueResponses, digitsAsWords } = gameContent;
+
+function setPlaceholderCategory(columnId: number): string {
+  return `Category ${digitsAsWords[columnId]}`;
+}
+
+function displayCategory(category: string, columnId: number): string {
+  return category ? category : setPlaceholderCategory(columnId);
+}
+
+function formatClueKey(columnId: number, dollarValue: number, round: number): string {
+  return `${round}-${columnId}-${dollarValue}`;
+}
+
+function isCluePlayed(
+  columnId: number,
+  dollarValue: number,
+  round: number,
+  playedClues: { [key: string]: string }
+): boolean {
+  const clueKey: string = formatClueKey(columnId, dollarValue, round);
+  return !!playedClues[clueKey];
+}
 
 function formatDisplayedScore(currentScore: number): string {
   const absoluteScore: string = Math.abs(currentScore).toString();
@@ -23,6 +45,10 @@ function formatDollarsDifference(responseName: string, dollarValue: number): num
 }
 
 const scoreFormatting = {
+  setPlaceholderCategory,
+  displayCategory,
+  formatClueKey,
+  isCluePlayed,
   formatDisplayedScore,
   formatDollarsDifference
 };

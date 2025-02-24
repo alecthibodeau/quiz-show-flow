@@ -13,21 +13,27 @@ import type { Column } from '../interfaces/Column';
 import gameContent from '../constants/game-content';
 
 /* Helpers */
-import scoreFormatting from '@/helpers/score-formatting';
+import formatting from '@/helpers/formatting';
 
 /* Styles */
 import '../styles/score-view.css';
 
 const {
   clueResponses,
-  digitsAsWords,
   dollarValuesFirst,
   dollarValuesSecond,
   initialColumns,
   initialCurrentClue
 } = gameContent;
 
-const { formatDisplayedScore, formatDollarsDifference } = scoreFormatting;
+const {
+  setPlaceholderCategory,
+  displayCategory,
+  formatClueKey,
+  isCluePlayed,
+  formatDisplayedScore,
+  formatDollarsDifference
+} = formatting;
 
 const formButtons: { label: string, action: () => void }[] = [
   { label: 'clear', action: clearCategories },
@@ -103,29 +109,13 @@ function clearCategories(): void {
   currentClue.category = '';
 }
 
-function formatClueKey(columnId: number, dollarValue: number): string {
-  return `${currentRound.value}-${columnId}-${dollarValue}`;
-}
-
-function isCluePlayed(columnId: number, dollarValue: number): boolean {
-  return !!playedClues[formatClueKey(columnId, dollarValue)];
-}
-
 function updateScore(clueResponse: ClueResponse): void {
   const dollarAmount: number = formatDollarsDifference(clueResponse.name, currentClue.dollarValue);
   currentScore.value += dollarAmount;
-  const clueKey: string = formatClueKey(currentClue.columnId, currentClue.dollarValue);
+  const clueKey: string = formatClueKey(currentClue.columnId, currentClue.dollarValue, currentRound.value);
   playedClues[clueKey] = clueResponse.scoringIncrementCode.toString();
   mostRecentResponse.value = clueResponse.name;
   clearClue();
-}
-
-function setPlaceholderCategory(columnId: number): string {
-  return `Category ${digitsAsWords[columnId]}`;
-}
-
-function displayCategory(category: string, columnId: number): string {
-  return category ? category : setPlaceholderCategory(columnId);
 }
 </script>
 
@@ -159,10 +149,10 @@ function displayCategory(category: string, columnId: number): string {
           v-for="dollarValue in column.dollarValues"
           :key="`${column.id}${dollarValue}`"
           @click="selectClue(column, dollarValue)"
-          :disabled="isCluePlayed(column.id, dollarValue)"
+          :disabled="isCluePlayed(column.id, dollarValue, currentRound, playedClues)"
           :class="['button-clue', {
             selected: column.id === currentClue.columnId && dollarValue === currentClue.dollarValue,
-            played: isCluePlayed(column.id, dollarValue)
+            played: isCluePlayed(column.id, dollarValue, currentRound, playedClues)
           }]"
         >
           {{ `$${dollarValue}` }}
