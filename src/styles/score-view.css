@@ -1,39 +1,5 @@
 @import './_variables.css';
 
-.button-app {
-  font-size: .75rem;
-  font-weight: 700;
-  border: 2px solid transparent;
-  border-radius: .375rem;
-  padding: .375rem;
-  background-color: var(--color-off-black);
-  color: var(--color-off-white);
-
-  &.hidden {
-    visibility: hidden;
-  }
-}
-
-.button-primary {
-  border-color: var(--color-off-white);
-
-  &.button-clear {
-    border-color: var(--color-red);
-    background-color: var(--color-red);
-  }
-
-  &.button-continue {
-    border-color: var(--color-green-dark);
-    background-color: var(--color-green-dark);
-  }
-}
-
-.button-secondary {
-  border-color: var(--color-blue-pale);
-  color: var(--color-off-black);
-  background-color: var(--color-blue-pale);
-}
-
 .rounds-container {
   display: flex;
   justify-content: space-between;
@@ -45,7 +11,7 @@
   text-align: center;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--color-gold);
+  color: var(--color-gold-medium);
 }
 
 .game-board {
@@ -62,7 +28,7 @@
   width: 100%;
   border: none;
   margin-top: 1px;
-  background-color: var(--color-blue);
+  background-color: var(--color-blue-medium);
   font-weight: 700;
 }
 
@@ -78,7 +44,7 @@
 .button-clue {
   padding: .875rem 0;
   font-size: .75rem;
-  color: var(--color-gold);
+  color: var(--color-gold-medium);
 
   &.selected {
     background-color: var(--color-gold-light);
@@ -86,7 +52,7 @@
   }
 
   &.played {
-    color: var(--color-blue);
+    color: var(--color-blue-medium);
   }
 }
 
@@ -96,7 +62,7 @@
   align-items: end;
   padding: .75rem;
   margin-top: 1px;
-  background-color: var(--color-gold);
+  background-color: var(--color-gold-medium);
 }
 
 .score-info > div {
@@ -108,7 +74,7 @@
   margin-bottom: .125rem;
   text-transform: uppercase;
   font-size: .75rem;
-  color: var(--color-blue);
+  color: var(--color-blue-medium);
 }
 
 .score-amount {
@@ -119,7 +85,7 @@
   color: var(--color-off-black);
 
   &.negative {
-    color: var(--color-red);
+    color: var(--color-red-medium);
   }
 }
 
@@ -145,7 +111,7 @@
 .most-recent-response {
   padding: .25rem 1rem;
   border-radius: .25rem;
-  background-color: var(--color-gray);
+  background-color: var(--color-gray-light);
 }
 
 .most-recent-response {
@@ -155,11 +121,11 @@
   }
 
   &.incorrect {
-    color: var(--color-red);
+    color: var(--color-red-medium);
   }
 
   &.pass {
-    color: var(--color-blue);
+    color: var(--color-blue-medium);
   }
 }
 

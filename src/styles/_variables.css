@@ -7,17 +7,18 @@
 
 :root {
 
-  /* Colors */
-  --color-black: #000;
-  --color-blue: #0a0ae7;
-  --color-blue-pale: #a1c5ff;
-  --color-gold: #f1c712;
-  --color-gold-light: #ffe77d;
-  --color-gray: #d6d6d6;
-  --color-green-html: #008000;
-  --color-green-dark: #006c00;
-  --color-red: #ae0404;
-  --color-white: #fff;
-  --color-off-white: #f5f5f5;
+  /* Colors Grayscale */
   --color-off-black: #0d0d0d;
+  --color-off-white: #f5f5f5;
+  --color-gray-light: #d6d6d6;
+
+  /* Colors Hued */
+  --color-blue-medium: #0a0ae7;
+  --color-blue-light: #a1c5ff;
+  --color-green-dark: #006c00;
+  --color-green-light: #85c477;
+  --color-gold-medium: #f1c712;
+  --color-gold-light: #ffe77d;
+  --color-orange-light: #d89415;
+  --color-red-medium: #ae0404;
 }

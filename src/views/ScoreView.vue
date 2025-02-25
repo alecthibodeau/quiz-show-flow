@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue';
 
 /* Components */
+import ButtonGameFlow from '@/components/ButtonGameFlow.vue';
 import ButtonResponse from '@/components/ButtonResponse.vue';
 
 /* Interfaces */
@@ -17,6 +18,7 @@ import formatting from '@/helpers/formatting';
 
 /* Styles */
 import '../styles/score-view.css';
+import '../styles/button-app.css';
 
 const {
   clueResponses,
@@ -36,8 +38,8 @@ const {
 } = formatting;
 
 const formButtons: { label: string, action: () => void }[] = [
-  { label: 'clear', action: clearCategories },
-  { label: 'continue', action: toggleCategories }
+  { label: 'continue', action: toggleCategories },
+  { label: 'clear', action: clearCategories }
 ];
 
 const columns = reactive<Column[]>(initialColumns);
@@ -122,19 +124,18 @@ function updateScore(clueResponse: ClueResponse): void {
 <template>
   <div class="score">
     <div class="rounds-container">
-      <button @click="startNewGame" class="button-app button-secondary">
-        New Game
-      </button>
+      <ButtonGameFlow
+        buttonName="New Game"
+        @click="startNewGame"
+      />
       <div class="round">
         {{ `&#8226; Round ${currentRound + 1} &#8226;` }}
       </div>
-      <button
+      <ButtonGameFlow
+        v-if="currentRound < 2"
+        buttonName="Next Round"
         @click="advanceRound"
-        class="button-app button-secondary"
-        :class="{ hidden: currentRound === 2 }"
-      >
-        Next Round
-      </button>
+      />
     </div>
     <div v-if="currentRound < 2" class="game-board">
       <div

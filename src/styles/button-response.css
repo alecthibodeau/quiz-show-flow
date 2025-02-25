@@ -35,7 +35,7 @@
 }
 
 .button-incorrect {
-  background-color: var(--color-red);
+  background-color: var(--color-red-medium);
 
   div {
     right: .2rem;
@@ -54,14 +54,14 @@
 }
 
 .button-pass {
-  background-color: var(--color-blue);
+  background-color: var(--color-blue-medium);
 
   div {
     height: 1.5rem;
     width: 1.5rem;
     border-radius: 50%;
     border: .375rem solid var(--color-off-white);
-    background-color: var(--color-blue);
+    background-color: var(--color-blue-medium);
     color: transparent;
 
     &:first-of-type {
