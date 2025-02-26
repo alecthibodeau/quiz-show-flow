@@ -32,8 +32,8 @@ onMounted(() => {
     :aria-label="clueResponse.name"
   >
     <div></div>
-    <div :class=[deviceType]>
-      <span>
+    <div>
+      <span :class=[deviceType]>
         {{ unicodeWhiteCircle }}
       </span>
     </div>

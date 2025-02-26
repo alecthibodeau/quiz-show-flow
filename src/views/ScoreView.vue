@@ -129,7 +129,7 @@ function updateScore(clueResponse: ClueResponse): void {
         @click="startNewGame"
       />
       <div class="round">
-        {{ `&#8226; Round ${currentRound + 1} &#8226;` }}
+          {{ `Round ${currentRound + 1}` }}
       </div>
       <ButtonGameFlow
         v-if="currentRound < 2"
@@ -204,7 +204,7 @@ function updateScore(clueResponse: ClueResponse): void {
       v-for="column of columns"
       :key="`input${column.id}`"
       type="text"
-      maxlength="20"
+      maxlength="36"
       v-model="column.category"
       :placeholder="`Enter ${setPlaceholderCategory(column.id)}`"
       class="categories-form-input"

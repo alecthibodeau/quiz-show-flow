@@ -57,22 +57,25 @@
   background-color: var(--color-blue-medium);
 
   div {
-    height: 1.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
     width: 1.5rem;
-    border-radius: 50%;
+    height: 1.5rem;
     border: .375rem solid var(--color-off-white);
+    border-radius: 50%;
     background-color: var(--color-blue-medium);
-    color: transparent;
 
     &:first-of-type {
       display: none;
     }
 
-    &.mobile {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 1.5rem;
+    span.desktop {
+      display: none;
+    }
+
+    span.mobile {
       color: var(--color-off-white);
     }
   }
