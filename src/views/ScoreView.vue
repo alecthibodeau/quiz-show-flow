@@ -124,18 +124,21 @@ function updateScore(clueResponse: ClueResponse): void {
 <template>
   <div class="score">
     <div class="rounds-container">
-      <ButtonGameFlow
-        buttonName="New Game"
-        @click="startNewGame"
-      />
+      <div>
+        <ButtonGameFlow
+          buttonName="New Game"
+          @click="startNewGame"
+        />
+      </div>
       <div class="round">
           {{ `Round ${currentRound + 1}` }}
       </div>
-      <ButtonGameFlow
-        v-if="currentRound < 2"
-        buttonName="Next Round"
-        @click="advanceRound"
-      />
+      <div :class="`next-round-button-container${currentRound > 1 ? ' hidden' : ''}`">
+        <ButtonGameFlow
+          buttonName="Next Round"
+          @click="advanceRound"
+        />
+      </div>
     </div>
     <div v-if="currentRound < 2" class="game-board">
       <div
@@ -188,8 +191,8 @@ function updateScore(clueResponse: ClueResponse): void {
   <div v-if="!isCategoriesFormDisplayed && !isNewRoundStart" class="info-box">
     <div v-if="currentClue.dollarValue" class="selected-clue-info">
       {{ `
-        ${displayCategory(currentClue.category, currentClue.columnId)}: $
-        ${currentClue.dollarValue}
+        ${displayCategory(currentClue.category, currentClue.columnId)}:
+        $${currentClue.dollarValue}
       ` }}
     </div>
     <div v-else-if="mostRecentResponse"
