@@ -173,6 +173,9 @@ function updateScore(clueResponse: ClueResponse): void {
           {{ formatDisplayedScore(currentScore) }}
         </div>
       </div>
+      <div>
+        <button>DD</button>
+      </div>
       <div v-if="!isCategoriesFormDisplayed && currentClue.dollarValue"
         class="response-buttons-container"
       >
