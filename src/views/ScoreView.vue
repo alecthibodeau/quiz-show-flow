@@ -119,6 +119,10 @@ function updateScore(clueResponse: ClueResponse): void {
   mostRecentResponse.value = clueResponse.name;
   clearClue();
 }
+
+function placeWager(): void {
+  alert('betting');
+}
 </script>
 
 <template>
@@ -173,19 +177,19 @@ function updateScore(clueResponse: ClueResponse): void {
           {{ formatDisplayedScore(currentScore) }}
         </div>
       </div>
-      <div>
-        <button>DD</button>
-      </div>
       <div v-if="!isCategoriesFormDisplayed && currentClue.dollarValue"
-        class="response-buttons-container"
+        class="clue-actions"
       >
-        <div v-for="clueResponse in clueResponses"
-          :key="`buttonResponse${clueResponse.name}`"
-        >
-          <ButtonResponse
-            :clueResponse="clueResponse"
-            @onClickButton="updateScore(clueResponse)"
-          />
+        <button class="button-wager" @click="placeWager">X</button>
+        <div class="response-buttons-container">
+          <div v-for="clueResponse in clueResponses"
+            :key="`buttonResponse${clueResponse.name}`"
+          >
+            <ButtonResponse
+              :clueResponse="clueResponse"
+              @onClickButton="updateScore(clueResponse)"
+            />
+          </div>
         </div>
       </div>
     </div>
