@@ -48,6 +48,7 @@ const currentRound = ref<number>(0);
 const currentScore = ref<number>(0);
 const isCategoriesFormDisplayed = ref<boolean>(false);
 const isNewRoundStart = ref<boolean>(true);
+  const isWageringActive = ref<boolean>(false);
 const mostRecentResponse = ref<string>('');
 const playedClues = reactive<{ [key: string]: string }>({});
 
@@ -180,7 +181,12 @@ function placeWager(): void {
       <div v-if="!isCategoriesFormDisplayed && currentClue.dollarValue"
         class="clue-actions"
       >
-        <button class="button-wager" @click="placeWager">X</button>
+        <button
+          v-if="isWageringActive"
+          class="button-wager" @click="placeWager"
+        >
+          X
+        </button>
         <div class="response-buttons-container">
           <div v-for="clueResponse in clueResponses"
             :key="`buttonResponse${clueResponse.name}`"
