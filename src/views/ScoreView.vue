@@ -38,7 +38,7 @@ const {
 } = formatting;
 
 const formButtons: { label: string, action: () => void }[] = [
-  { label: 'continue', action: toggleCategories },
+  { label: 'continue', action: continueCategories },
   { label: 'clear', action: clearCategories }
 ];
 
@@ -46,9 +46,8 @@ const columns = reactive<Column[]>(initialColumns);
 const currentClue = reactive<Clue>({...initialCurrentClue});
 const currentRound = ref<number>(0);
 const currentScore = ref<number>(0);
-const isCategoriesFormDisplayed = ref<boolean>(false);
 const isNewRoundStart = ref<boolean>(true);
-  const isWageringActive = ref<boolean>(false);
+const isWageringActive = ref<boolean>(false);
 const mostRecentResponse = ref<string>('');
 const playedClues = reactive<{ [key: string]: string }>({});
 
@@ -62,7 +61,6 @@ function resetColumns(): void {
 function resetGameBoard(): void {
   clearClue();
   resetColumns();
-  if (isCategoriesFormDisplayed.value) isCategoriesFormDisplayed.value = false;
   isNewRoundStart.value = true;
   mostRecentResponse.value = '';
 }
@@ -96,20 +94,25 @@ function selectClue(column: Column, dollarValue: number): void {
     currentClue.dollarValue = dollarValue;
   }
   if (isNewRoundStart.value) isNewRoundStart.value = false;
-  if (isCategoriesFormDisplayed.value) isCategoriesFormDisplayed.value = false;
 }
 
-function toggleCategories(): void {
+function scrollToTop(): void {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+function continueCategories(): void {
   clearClue();
-  isCategoriesFormDisplayed.value = !isCategoriesFormDisplayed.value;
   if (isNewRoundStart.value) isNewRoundStart.value = false;
+  scrollToTop();
 }
 
 function clearCategories(): void {
-  columns.forEach(column => {
-    column.category = '';
-  });
+  columns.forEach(column => column.category = '');
   currentClue.category = '';
+  scrollToTop();
 }
 
 function updateScore(clueResponse: ClueResponse): void {
@@ -136,7 +139,7 @@ function placeWager(): void {
         />
       </div>
       <div class="round">
-          {{ `Round ${currentRound + 1}` }}
+        {{ `Round ${currentRound + 1}` }}
       </div>
       <div :class="`next-round-button-container${currentRound > 1 ? ' hidden' : ''}`">
         <ButtonGameFlow
@@ -151,7 +154,7 @@ function placeWager(): void {
         :key="`column${column.id}`"
         class="column"
       >
-        <button @click="toggleCategories" class="button-category">
+        <button popovertarget="categoriesPopover" class="button-category">
           {{ displayCategory(column.category, column.id) }}
         </button>
         <button
@@ -178,9 +181,7 @@ function placeWager(): void {
           {{ formatDisplayedScore(currentScore) }}
         </div>
       </div>
-      <div v-if="!isCategoriesFormDisplayed && currentClue.dollarValue"
-        class="clue-actions"
-      >
+      <div v-if="currentClue.dollarValue" class="clue-actions">
         <button
           v-if="isWageringActive"
           class="button-wager" @click="placeWager"
@@ -201,7 +202,7 @@ function placeWager(): void {
     </div>
   </div>
 
-  <div v-if="!isCategoriesFormDisplayed && !isNewRoundStart" class="info-box">
+  <div v-if="!isNewRoundStart" class="info-box">
     <div v-if="currentClue.dollarValue" class="selected-clue-info">
       {{ `
         ${displayCategory(currentClue.category, currentClue.columnId)}:
@@ -215,7 +216,8 @@ function placeWager(): void {
     </div>
   </div>
 
-  <div v-if="isCategoriesFormDisplayed" class="categories-form">
+  <div id="categoriesPopover" class="categories-popover" popover>
+    <div class="categories-popover-title">Categories</div>
     <input
       v-for="column of columns"
       :key="`input${column.id}`"
@@ -230,7 +232,9 @@ function placeWager(): void {
         v-for="formButton of formButtons"
         :key="`formButton${formButton.label}`"
         @click="typeof formButton.action === 'function' && formButton.action()"
-        :class="`button-app button-primary button-${formButton.label}`"
+        :class="`button-app button-primary button-form button-${formButton.label}`"
+        popovertarget="categoriesPopover"
+        popovertargetaction="hide"
       >
         {{ formButton.label.charAt(0).toUpperCase() + formButton.label.slice(1) }}
       </button>

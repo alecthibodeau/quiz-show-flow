@@ -15,13 +15,17 @@
 .button-primary {
   border-color: var(--color-off-white);
 
+  &.button-form {
+    padding: .5rem 1rem;
+    border-width: 1px;
+    font-size: 1rem;
+  }
+
   &.button-continue {
-    border-color: var(--color-green-dark);
     background-color: var(--color-green-dark);
   }
 
   &.button-clear {
-    border-color: var(--color-red-medium);
     background-color: var(--color-red-medium);
   }
 }
